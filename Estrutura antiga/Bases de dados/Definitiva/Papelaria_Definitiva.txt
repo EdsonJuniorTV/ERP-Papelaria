@@ -1,0 +1,270 @@
+create database if not exists papelaria;
+use papelaria;
+
+-- Cargos
+create table cargo(
+    id          int 			primary key 	auto_increment,
+    nome        varchar(100) 		not null	unique
+);
+
+-- Endereços
+create table endereco(
+    id          int 			primary key 	auto_increment,
+    logradouro  varchar(200) 		not null,
+    cidade      varchar(100) 		not null,
+    estado      char(2) 		not null,
+    cep         char(8) 		not null
+);
+
+-- Funcionários
+create table funcionario(
+    id          int 			primary key 	auto_increment,
+    id_cargo    int 			not null,
+    cpf         char(11) 		not null 		unique,
+    id_end      int 			not null,
+    nome        varchar(80) 		not null,
+    dt_nasc     date 			not null,
+    dt_admissao date 			not null,
+    dt_saida    date,
+    status      enum('Ativo','Inativo','Demitido') default 'Ativo',
+    fone        varchar(20) 	not null,
+    email       varchar(120) 	not null,
+    foreign key (id_cargo) references cargo(id),
+    foreign key (id_end) references endereco(id)
+);
+
+-- Histórico de funcionários
+create table historico_funcionario(
+    id          int 			primary key 	auto_increment,
+    id_func     int 			not null,
+    evento      varchar(50) 		not null,
+    dt_evento   date 			not null,
+    foreign key (id_func) references funcionario(id)
+);
+
+-- Clientes
+create table cliente(
+    id          int 			primary key 	auto_increment,
+    cpf         char(11) 		not null 		unique,
+    id_end      int 			not null,
+    nome        varchar(80) 	not null,
+    dt_nasc     date 			not null,
+    fone        varchar(20) 	not null,
+    email       varchar(120) 	not null,
+    foreign key (id_end) references endereco(id)
+);
+
+-- Fornecedores
+create table fornecedor(
+    id          int 			primary key 	auto_increment,
+    nome        varchar(80) 	not null,
+    cnpj        char(14) 		not null 		unique,
+    fone        varchar(20) 	not null,
+    email       varchar(120) 	not null,
+    id_end      int,
+    foreign key (id_end) references endereco(id)
+);
+
+-- Categorias
+create table categoria(
+    id          int 			primary key 	auto_increment,
+    nome        varchar(100) 	not null 		unique
+);
+
+-- Produtos
+create table produto(
+    id          int 			primary key 	auto_increment,
+    id_forn     int 			not null,
+    id_cat      int 			not null,
+    nome        varchar(150) 		not null,
+    preco       decimal(10,2) 		not null,
+    custo       decimal(10,2) 		not null,
+    foreign key (id_forn) references fornecedor(id),
+    foreign key (id_cat) references categoria(id)
+);
+
+-- Histórico dos produtos
+create table historico_produto(
+    id              int             primary key auto_increment,
+    id_prod         int             not null,
+    campo_alterado  varchar(50)     not null,
+    valor_antigo    varchar(200),
+    valor_novo      varchar(200),
+    dt_alteracao    datetime        default current_timestamp,
+    id_func         int, -- quem fez a alteração
+    foreign key (id_prod) references produto(id),
+    foreign key (id_func) references funcionario(id)
+);
+
+
+-- Estoque (estado atual)
+create table estoque(
+    id          int 			primary key 	auto_increment,
+    id_prod     int 			not null,
+    qtd         int 			not null,
+    qtd_minima  int 			default 0,
+    foreign key (id_prod) references produto(id)
+);
+
+-- Movimentação de estoque (histórico)
+create table movimentacao_estoque(
+    id          int 			primary key 	auto_increment,
+    id_prod     int 			not null,
+    tipo        enum('Entrada','Saida','Ajuste') not null,
+    qtd         int 			not null,
+    dt_mov      datetime 		default current_timestamp,
+    foreign key (id_prod) references produto(id)
+);
+
+-- Pedidos (clientes)
+create table pedido(
+    id          int 			primary key 	auto_increment,
+    id_cli      int 			not null,
+    id_func     int 			not null,
+    dt_pedido   datetime 		default current_timestamp,
+    status      enum('Aberto','Pago','Cancelado') default 'Aberto',
+    foreign key (id_cli) references cliente(id),
+    foreign key (id_func) references funcionario(id)
+);
+
+-- Itens do pedido
+create table item_pedido(
+    id              int 		primary key 	auto_increment,
+    id_ped          int 		not null,
+    id_prod         int 		not null,
+    qtd             int 		not null,
+    preco_unitario  decimal(10,2) 	not null,
+    foreign key (id_ped) references pedido(id),
+    foreign key (id_prod) references produto(id)
+);
+
+-- Comissões
+create table comissao(
+    id          int 			primary key 	auto_increment,
+    id_func     int 			not null,
+    id_ped      int 			not null,
+    valor       decimal(10,2) 		not null,
+    foreign key (id_func) references funcionario(id),
+    foreign key (id_ped) references pedido(id)
+);
+
+-- Compras de fornecedores
+create table compra(
+    id          int 			primary key 	auto_increment,
+    id_forn     int 			not null,
+    id_func     int 			not null,
+    dt_compra   datetime 		default current_timestamp,
+    valor_total decimal(10,2),
+    foreign key (id_forn) references fornecedor(id),
+    foreign key (id_func) references funcionario(id)
+);
+
+-- Itens da compra
+create table item_compra(
+    id          int 			primary key 	auto_increment,
+    id_compra   int 			not null,
+    id_prod     int 			not null,
+    qtd         int 			not null,
+    preco_unit  decimal(10,2) 		not null,
+    foreign key (id_compra) references compra(id),
+    foreign key (id_prod) references produto(id)
+);
+
+-- Movimentações financeiras
+create table movimentacao_financeira(
+    id          int 			primary key 	auto_increment,
+    tipo        enum('Entrada','Saida') not null,
+    descricao   varchar(200) 		not null,
+    valor       decimal(10,2) 		not null,
+    dt_mov      date 			not null,
+    id_ped      int,
+    id_comissao int,
+    id_compra   int,
+    foreign key (id_ped) references pedido(id),
+    foreign key (id_comissao) references comissao(id),
+    foreign key (id_compra) references compra(id)
+);
+
+delimiter //
+
+create trigger trg_item_pedido_insert
+after insert on item_pedido
+for each row
+begin
+    update estoque
+    set qtd = qtd - NEW.qtd
+    where id_prod = NEW.id_prod;
+
+    insert into movimentacao_estoque(id_prod, tipo, qtd)
+    values (NEW.id_prod, 'Saida', NEW.qtd);
+end;
+
+create trigger trg_item_compra_insert
+after insert on item_compra
+for each row
+begin
+    update estoque
+    set qtd = qtd + NEW.qtd
+    where id_prod = NEW.id_prod;
+
+    insert into movimentacao_estoque(id_prod, tipo, qtd)
+    values (NEW.id_prod, 'Entrada', NEW.qtd);
+end;
+
+create trigger trg_pedido_pago
+after update on pedido
+for each row
+begin
+    if NEW.status = 'Pago' and OLD.status <> 'Pago' then
+        insert into movimentacao_financeira(tipo, descricao, valor, dt_mov, id_ped)
+        values ('Entrada',
+                concat('Pagamento pedido #', NEW.id),
+                (select sum(qtd * preco_unitario) from item_pedido where id_ped = NEW.id),
+                curdate(),
+                NEW.id);
+    end if;
+end;
+
+create trigger trg_compra_insert
+after insert on compra
+for each row
+begin
+    insert into movimentacao_financeira(tipo, descricao, valor, dt_mov, id_compra)
+    values ('Saida',
+            concat('Compra de produtos do fornecedor #', NEW.id_forn),
+            NEW.valor_total,
+            curdate(),
+            NEW.id);
+end;
+
+delimiter ;
+
+select 
+    p.id as pedido_id,
+    c.nome as cliente,
+    c.cpf,
+    f.nome as funcionario,
+    p.dt_pedido,
+    group_concat(concat(ip.qtd, 'x ', pr.nome, ' (R$ ', ip.preco_unitario, ')') separator '\n') as itens,
+    sum(ip.qtd * ip.preco_unitario) as total,
+    mf.dt_mov as data_pagamento
+from pedido p
+join cliente c on p.id_cli = c.id
+join funcionario f on p.id_func = f.id
+join item_pedido ip on p.id = ip.id_ped
+join produto pr on ip.id_prod = pr.id
+left join movimentacao_financeira mf on mf.id_ped = p.id and mf.tipo = 'Entrada'
+where p.id = 123 -- número do pedido
+group by p.id, c.nome, c.cpf, f.nome, p.dt_pedido, mf.dt_mov;
+
+select 
+    co.id as compra_id,
+    fo.nome as fornecedor,
+    f.nome as funcionario,
+    co.dt_compra,
+    group_concat(concat(ic.qtd, 'x ', pr.nome, ' (R$ ', ic.preco_unit, ')') separator '\n') as itens,
+    sum(ic.qtd * ic.preco_unit) as total,
+    mf.dt_mov as data_pagamento,
+    mf.valor as valor_saida
+from compra co
+join fornecedor fo on co.id

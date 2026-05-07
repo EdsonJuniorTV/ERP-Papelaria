@@ -1,0 +1,331 @@
+-- 1. Criação do Banco
+create database if not exists papelaria;
+use papelaria;
+
+-- 2. Tabelas de Configuração (Base)
+create table cargo(
+    id int primary key auto_increment,
+    nome varchar(100) not null unique
+);
+
+create table categoria(
+    id int primary key auto_increment,
+    nome varchar(100) not null unique
+);
+
+create table marca(
+    id int primary key auto_increment,
+    nome varchar(100) not null unique
+);
+
+create table endereco(
+    id int primary key auto_increment,
+    logradouro varchar(200) not null,
+    cidade varchar(100) not null,
+    estado char(2) not null,
+    cep char(8) not null
+);
+
+-- 3. Tabelas de Entidades (Pessoas e Empresas)
+create table funcionario(
+    id int primary key auto_increment,
+    id_cargo int not null,
+    id_end int not null,
+    cpf char(11) not null unique,
+    nome varchar(80) not null,
+    login varchar(50) not null unique, -- Adicionado para o sistema
+    senha varchar(255) not null,       -- Adicionado para o sistema
+    dt_nasc date not null,
+    dt_admissao date not null,
+    dt_saida date,
+    status enum('Ativo','Inativo','Demitido') default 'Ativo',
+    fone varchar(20) not null,
+    email varchar(120) not null,
+    foreign key (id_cargo) references cargo(id),
+    foreign key (id_end) references endereco(id)
+);
+
+-- Histórico de status dos funcionários
+create table historico_funcionario(
+    id int primary key auto_increment,
+    id_func int not null,
+    evento varchar(100) not null,
+    dt_evento datetime default current_timestamp,
+    foreign key (id_func) references funcionario(id)
+);
+
+create table folha_pagamento (
+    id int primary key auto_increment,
+    id_func int not null,
+    mes_referencia int not null, -- Ex: 5 (Maio)
+    ano_referencia int not null, -- Ex: 2026
+    valor_pago decimal(10,2) not null,
+    dt_pagamento date not null,
+    foreign key (id_func) references funcionario(id)
+);
+
+create table cliente(
+    id int primary key auto_increment,
+    cpf char(11) not null unique,
+    id_end int not null,
+    nome varchar(80) not null,
+    dt_nasc date not null,
+    fone varchar(20) not null,
+    email varchar(120) not null,
+    foreign key (id_end) references endereco(id)
+);
+
+create table fornecedor(
+    id int primary key auto_increment,
+    nome varchar(80) not null,
+    cnpj char(14) not null unique,
+    fone varchar(20) not null,
+    email varchar(120) not null,
+    id_end int,
+    foreign key (id_end) references endereco(id)
+);
+
+-- 4. Tabelas de Produtos e Estoque
+create table produto(
+    id int primary key auto_increment,
+    id_forn int not null,
+    id_cat int not null,
+    id_marca int not null, -- Adicionado para normalização
+    nome varchar(150) not null,
+    preco decimal(10,2) not null,
+    custo decimal(10,2) not null,
+    foreign key (id_forn) references fornecedor(id),
+    foreign key (id_cat) references categoria(id),
+    foreign key (id_marca) references marca(id)
+);
+
+-- Histórico de alterações nos produtos
+create table historico_produto(
+    id int primary key auto_increment,
+    id_prod int not null,
+    id_func int not null,
+    campo_alterado varchar(50) not null,
+    valor_antigo varchar(200),
+    valor_novo varchar(200),
+    dt_alteracao datetime default current_timestamp,
+    foreign key (id_prod) references produto(id),
+    foreign key (id_func) references funcionario(id)
+);
+
+create table estoque(
+    id int primary key auto_increment,
+    id_prod int not null unique, -- Um registro por produto
+    qtd int not null default 0,
+    qtd_minima int default 5,
+    foreign key (id_prod) references produto(id)
+);
+
+-- 5. Tabelas de Operações
+create table pedido(
+    id int primary key auto_increment,
+    id_cli int not null,
+    id_func int not null,
+    dt_pedido datetime default current_timestamp,
+    status enum('Aberto','Pago','Cancelado') default 'Aberto',
+    foreign key (id_cli) references cliente(id),
+    foreign key (id_func) references funcionario(id)
+);
+
+create table item_pedido(
+    id int primary key auto_increment,
+    id_ped int not null,
+    id_prod int not null,
+    qtd int not null,
+    preco_unitario decimal(10,2) not null,
+    foreign key (id_ped) references pedido(id),
+    foreign key (id_prod) references produto(id)
+);
+
+create table compra(
+    id int primary key auto_increment,
+    id_forn int not null,
+    id_func int not null,
+    dt_compra datetime default current_timestamp,
+    valor_total decimal(10,2),
+    foreign key (id_forn) references fornecedor(id),
+    foreign key (id_func) references funcionario(id)
+);
+
+create table item_compra(
+    id int primary key auto_increment,
+    id_compra int not null,
+    id_prod int not null,
+    qtd int not null,
+    preco_unit decimal(10,2) not null,
+    foreign key (id_compra) references compra(id),
+    foreign key (id_prod) references produto(id)
+);
+
+create table movimentacao_financeira(
+    id int primary key auto_increment,
+    tipo enum('Entrada','Saida') not null,
+    descricao varchar(200) not null,
+    valor decimal(10,2) not null,
+    dt_mov date not null,
+    id_ped int,
+    id_compra int,
+    foreign key (id_ped) references pedido(id),
+    foreign key (id_compra) references compra(id)
+);
+
+create table comissao(
+    id int primary key auto_increment,
+    id_func int not null,
+    id_ped int not null,
+    id_item_ped int not null, -- Vinculado ao item específico
+    valor_comissao decimal(10,2) not null,
+    dt_gerada datetime default current_timestamp,
+    foreign key (id_func) references funcionario(id),
+    foreign key (id_ped) references pedido(id)
+);
+
+-- 6. TRIGGERS (Automação)
+
+delimiter //
+
+-- NOVO TRIGGER: Cria estoque automático ao inserir produto
+create trigger trg_produto_insert_estoque
+after insert on produto
+for each row
+begin
+    insert into estoque (id_prod, qtd, qtd_minima)
+    values (NEW.id, 0, 5);
+end; //
+
+-- Trigger: Atualiza estoque na venda
+create trigger trg_item_pedido_insert
+after insert on item_pedido
+for each row
+begin
+    update estoque set qtd = qtd - NEW.qtd where id_prod = NEW.id_prod;
+end; //
+
+-- Trigger: Atualiza estoque na compra
+create trigger trg_item_compra_insert
+after insert on item_compra
+for each row
+begin
+    update estoque set qtd = qtd + NEW.qtd where id_prod = NEW.id_prod;
+end; //
+
+-- Trigger: Financeiro na venda paga
+create trigger trg_pedido_pago
+after update on pedido
+for each row
+begin
+    if NEW.status = 'Pago' and OLD.status <> 'Pago' then
+        insert into movimentacao_financeira(tipo, descricao, valor, dt_mov, id_ped)
+        values ('Entrada', concat('Pagamento pedido #', NEW.id), 
+               (select sum(qtd * preco_unitario) from item_pedido where id_ped = NEW.id), 
+               curdate(), NEW.id);
+    end if;
+end; //
+
+create trigger trg_log_preco_produto
+after update on produto
+for each row
+begin
+    if OLD.preco <> NEW.preco then
+        insert into historico_produto (id_prod, campo_alterado, valor_antigo, valor_novo)
+        values (OLD.id, 'preco', OLD.preco, NEW.preco);
+    end if;
+    
+    if OLD.nome <> NEW.nome then
+        insert into historico_produto (id_prod, campo_alterado, valor_antigo, valor_novo)
+        values (OLD.id, 'nome', OLD.nome, NEW.nome);
+    end if;
+end; //
+
+create trigger trg_log_status_funcionario
+after update on funcionario
+for each row
+begin
+    if OLD.status <> NEW.status then
+        insert into historico_funcionario (id_func, evento)
+        values (OLD.id, concat('Alteração de status: de ', OLD.status, ' para ', NEW.status));
+    end if;
+    
+    if OLD.id_cargo <> NEW.id_cargo then
+        insert into historico_funcionario (id_func, evento)
+        values (OLD.id, 'Mudança de cargo/promoção');
+    end if;
+end; //
+
+delimiter //
+
+create trigger trg_gera_comissao_item
+after insert on item_pedido
+for each row
+begin
+    -- Busca quem é o funcionário que fez o pedido
+    set @vendedor_id = (select id_func from pedido where id = NEW.id_ped);
+    
+    -- Insere a comissão (5% do preço unitário * quantidade)
+    insert into comissao (id_func, id_ped, id_item_ped, valor_comissao)
+    values (@vendedor_id, NEW.id_ped, NEW.id, (NEW.preco_unitario * NEW.qtd) * 0.05);
+end; //
+
+delimiter ;
+
+delimiter ;
+
+-- 7. Dados Iniciais para Teste
+insert into endereco(logradouro, cidade, estado, cep) values ('Parque Jardim Europa','Bauru','SP','17017050');
+insert into cargo(nome) values ('Gerente'), ('Vendedor');
+insert into categoria(nome) values ('Escrita'), ('Papéis');
+insert into marca(nome) values ('Bic'), ('Faber-Castell');
+insert into fornecedor(nome, cnpj, fone, email, id_end) values ('Distribuidora Central', '12345678000199', '1499999999', 'contato@dist.com', 1);
+
+-- Ao inserir este produto, o estoque será criado automaticamente pelo trigger
+insert into produto(id_forn, id_cat, id_marca, nome, preco, custo) 
+values (1, 1, 1, 'Caneta Cristal Azul', 2.50, 1.00);
+
+select f.nome, sum(c.valor_comissao) as total_a_pagar
+from comissao c
+join funcionario f on c.id_func = f.id
+group by f.id;
+
+
+
+Estrutura das pasta (Quais arquivos manter):
+/papelaria (Pasta Raiz)
+│
+├── /config                 # Configurações centrais
+│   └── conexao.php         # Conexão única com o BD papelaria
+│
+├── /includes               # Códigos repetitivos e segurança
+│   ├── auth.php            # Verifica login e cargos (Gerente, Vendedor, etc)
+│   ├── header.php          # O menu dinâmico que você já tem (ajustado)
+│   └── footer.php          # Rodapé padrão
+│
+├── /public                 # Arquivos que o navegador acessa diretamente
+│   ├── /css
+│   │   ├── estilo.css      # Estilo original do cadastro
+│   │   ├── caixa.css       # Estilo do seu amigo para o PDV
+│   │   ├── header.css      # Estilo do menu superior
+│   │   └── cadastrar.css   # Estilo dos formulários CRUD
+│   ├── /js
+│   │   └── cadastrar.js    # Script de validação e máscaras (CPF/Fone)
+│   └── /assets             # Imagens, logos e ícones
+│
+├── /controllers            # Arquivos que processam dados (os "salvar")
+│   ├── api.php             # Ponte para o CRUD de funcionários
+│   ├── funcionario.php     # Lógica do CRUD (cadastrar, listar, excluir)
+│   ├── salvar_cliente.php  # Processa o cadastro de clientes
+│   ├── salvar_venda.php    # Processa o fechamento do pedido
+│   └── baixar_estoque.php  # Aciona a baixa (via Trigger do Banco)
+│
+├── index.php               # Landing Page (Novidades + Login)
+├── processa_login.php      # Verifica senha e cria a $_SESSION
+├── dashboard.php           # Menu Principal após o login
+├── caixa.php               # Tela de Vendas (o arquivo do seu amigo)
+├── clientes.php            # CRUD de Clientes (seu arquivo index.php antigo)
+├── estoque.php             # Visualização de produtos e fornecedores
+├── financeiro.php          # Relatórios de lucro (RESTRITO)
+├── funcionarios_gestao.php # CRUD de Funcionários (RESTRITO)
+└── logout.php              # Encerra a sessão e volta para o index
