@@ -1,21 +1,25 @@
 <?php
-require_once 'config/conexao.php';
-require_once 'includes/auth.php';
+header('Content-Type: application/json');
+require_once '../config/conexao.php';
 
-$id_ped  = $_POST['id_pedido'];
-$id_prod = $_POST['id_prod'];
-$qtd     = $_POST['qtd'];
-$preco   = $_POST['preco'];
+$id_ped  = $_POST['id_pedido'] ?? null;
+$id_prod = $_POST['id_prod'] ?? null;
+$qtd     = $_POST['qtd'] ?? 0;
+$preco   = $_POST['preco'] ?? 0;
 
-// 1. Insere o item. 
-// O Trigger 'trg_item_pedido_insert' baixará o estoque automaticamente.
-// O Trigger 'trg_gera_comissao_item' calculará a comissão automaticamente.
-$sql = "INSERT INTO item_pedido (id_ped, id_prod, qtd, preco_unitario) 
-        VALUES ('$id_ped', '$id_prod', '$qtd', '$preco')";
+if (!$id_ped || !$id_prod) {
+    echo json_encode(["status" => "erro", "msg" => "Dados incompletos"]);
+    exit;
+}
 
-if(mysqli_query($conexao, $sql)) {
+// O Prepared Statement evita que erros de aspas no nome do produto quebrem a query
+$sql = "INSERT INTO item_pedido (id_ped, id_prod, qtd, preco_unitario) VALUES (?, ?, ?, ?)";
+$stmt = $conexao->prepare($sql);
+$stmt->bind_param("iiid", $id_ped, $id_prod, $qtd, $preco);
+
+if($stmt->execute()) {
     echo json_encode(["status" => "sucesso"]);
 } else {
-    echo json_encode(["status" => "erro", "msg" => mysqli_error($conexao)]);
+    // Aqui o TRIGGER de estoque insuficiente pode disparar um erro que será pego
+    echo json_encode(["status" => "erro", "msg" => $stmt->error]);
 }
-?>

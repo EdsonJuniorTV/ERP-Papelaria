@@ -256,8 +256,6 @@ begin
     end if;
 end; //
 
-delimiter //
-
 create trigger trg_gera_comissao_item
 after insert on item_pedido
 for each row
@@ -270,7 +268,21 @@ begin
     values (@vendedor_id, NEW.id_ped, NEW.id, (NEW.preco_unitario * NEW.qtd) * 0.05);
 end; //
 
-delimiter ;
+CREATE TRIGGER trg_item_pedido_check_estoque
+BEFORE INSERT ON item_pedido
+FOR EACH ROW
+BEGIN
+    DECLARE estoque_atual INT;
+
+    -- Busca a quantidade atual no estoque
+    SELECT qtd INTO estoque_atual FROM estoque WHERE id_prod = NEW.id_prod;
+
+    -- Se a quantidade for insuficiente, cancela a operação com um erro personalizado
+    IF estoque_atual < NEW.qtd THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'ERRO: Estoque insuficiente para este produto!';
+    END IF;
+END; //
 
 delimiter ;
 

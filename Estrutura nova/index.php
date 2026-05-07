@@ -2,105 +2,78 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Papelaria Jardim Europa - Bem-vindo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Papelaria Central - Bem-vindo</title>
     <link rel="stylesheet" href="public/css/header.css">
     <link rel="stylesheet" href="public/css/cadastrar.css">
     <style>
         .hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
             color: white;
-            padding: 60px 20px;
+            padding: 80px 20px;
             text-align: center;
         }
-        .novidades-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            padding: 40px 20px;
-            max-width: 1200px;
-            margin: 0 auto;
+        .login-section {
+            background: #f4f7f6;
+            padding: 60px 20px;
         }
         .card-noticia {
             background: white;
-            border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        .login-section {
-            background: #f4f4f4;
-            padding: 50px 20px;
-            text-align: center;
-        }
-        .btn-login-destaque {
-            background: #764ba2;
-            color: white;
-            padding: 15px 40px;
-            border-radius: 30px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1.2rem;
-            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.4);
-            transition: 0.3s;
-        }
-        .btn-login-destaque:hover {
-            transform: translateY(-3px);
-            background: #667eea;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
         }
     </style>
 </head>
 <body>
 
-    <header class="top-header">
-        <div class="main-header">
-            <div class="logo"><h2>Papelaria Jardim Europa</h2></div>
-            <a href="#login" class="btn-submit" style="width: auto; padding: 10px 25px;">Acesso Restrito</a>
-        </div>
+    <header class="hero">
+        <h1>✏️ Papelaria Central</h1>
+        <p>Sistema Interno de Gestão de Vendas e Estoque</p>
     </header>
 
-    <section class="hero">
-        <h1>Transforme as suas ideias em papel</h1>
-        <p>As melhores marcas e novidades do mundo escolar e de escritório.</p>
-    </section>
-
-    <main>
-        <div class="header" style="background: none; color: #333; margin-top: 30px;">
-            <h2>✨ Novidades da Semana</h2>
-        </div>
+    <main class="container" style="max-width: 1000px; display: grid; grid-template-columns: 1fr 400px; gap: 40px; margin-top: -40px;">
         
-        <div class="novidades-grid">
+        <section>
             <div class="card-noticia">
-                <h3>Volta às Aulas 2026</h3>
-                <p>Já recebemos a nova coleção de cadernos e estojos da Faber-Castell. Venha conferir!</p>
+                <h3>📢 Comunicado Interno</h3>
+                <p>O inventário geral será realizado no próximo sábado. Certifiquem-se de atualizar todas as entradas de nota fiscal até sexta-feira.</p>
             </div>
             <div class="card-noticia">
-                <h3>Novas Canetas Pastel</h3>
-                <p>As queridinhas chegaram! Reposição de marcadores Stabilo em tons pastéis.</p>
+                <h3>🚀 Atualização de Segurança</h3>
+                <p>A partir de agora, o sistema utiliza sessões protegidas por cargo. Caso tenha problemas no acesso, procure o administrador.</p>
             </div>
-            <div class="card-noticia">
-                <h3>Setor de Presentes</h3>
-                <p>Agora temos uma linha exclusiva de agendas e planners personalizados.</p>
-            </div>
-        </div>
-    </main>
+        </section>
 
-    <section id="login" class="login-section">
-        <div class="container" style="max-width: 400px;">
-            <div class="header">
-                <h1>Login do Funcionário</h1>
-            </div>
+        <section id="login" class="card" style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+            <h2 style="text-align: center; margin-bottom: 20px;">Acesso Restrito</h2>
+            
             <form action="processa_login.php" method="POST">
                 <div class="form-group">
-                    <label>Usuário</label>
-                    <input type="text" name="login" required placeholder="Digite seu login">
+                    <label>Usuário / Login</label>
+                    <input type="text" name="login" required placeholder="Digite seu usuário" style="width: 100%; padding: 12px; margin-top: 5px;">
                 </div>
-                <div class="form-group">
+                
+                <div class="form-group" style="margin-top: 15px;">
                     <label>Senha</label>
-                    <input type="password" name="senha" required placeholder="********">
+                    <input type="password" name="senha" required placeholder="********" style="width: 100%; padding: 12px; margin-top: 5px;">
                 </div>
-                <button type="submit" class="btn-submit">Entrar no Sistema</button>
-            </form>
-        </div>
-    </section>
 
-</body>
-</html>
+                <button type="submit" class="btn-submit" style="width: 100%; margin-top: 25px; background: #27ae60;">
+                    🔓 Entrar no Sistema
+                </button>
+            </form>
+
+            <script>
+                // Verifica erro de login via URL
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('erro')) {
+                    alert('Usuário ou senha incorretos, ou conta inativa.');
+                }
+            </script>
+        </section>
+
+    </main>
+
+    <?php include 'includes/footer.php'; ?>

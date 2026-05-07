@@ -1,41 +1,52 @@
-<?php 
-require_once 'includes/auth.php'; 
+<?php
+require_once 'includes/auth.php';
+include 'includes/header.php';
 $cargo = $_SESSION['user_cargo'];
-$admin = ['Gerente', 'Dono', 'Programador'];
 ?>
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <link rel="stylesheet" href="public/css/header.css">
-    <link rel="stylesheet" href="public/css/cadastrar.css">
-    <title>Papelaria - Home</title>
-</head>
-<body>
-    <header class="top-header">
-        <div class="main-header">
-            <h2>Olá, <?php echo $_SESSION['user_nome']; ?></h2>
-            <nav class="nav-menu">
-                <ul>
-                    <li><a href="caixa.php">🛒 Caixa</a></li>
-                    <li><a href="clientes.php">👥 Clientes</a></li>
-                    <li><a href="estoque.php">📦 Estoque</a></li>
-                    <?php if(in_array($cargo, $admin)): ?>
-                        <li><a href="funcionarios.php">👔 Funcionários</a></li>
-                        <li><a href="financeiro.php">💰 Financeiro</a></li>
-                    <?php endif; ?>
-                    <li><a href="logout.php">🚪 Sair</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
 
-    <main class="wrap">
-        <h1>Novidades da Empresa</h1>
-        <div class="container">
-            <div class="header">
-                <p>Confira os novos itens de papelaria escolar que chegaram esta semana!</p>
+<main class="container">
+    <div class="header">
+        <h1>👋 Olá, <?= $_SESSION['user_nome'] ?></h1>
+        <p>Painel de Controle - Papelaria Interna</p>
+    </div>
+
+    <div class="grid-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 30px;">
+        
+        <div class="card" onclick="location.href='caixa.php'" style="cursor:pointer; background: #3498db; color: white; padding: 30px; border-radius: 10px; text-align: center;">
+            <div style="font-size: 40px; margin-bottom: 10px;">🛒</div>
+            <h3>Frente de Caixa (PDV)</h3>
+            <p>Realizar vendas e emitir pedidos</p>
+        </div>
+
+        <div class="card" onclick="location.href='cadastro.php'" style="cursor:pointer; background: #1abc9c; color: white; padding: 30px; border-radius: 10px; text-align: center;">
+            <div style="font-size: 40px; margin-bottom: 10px;">👥</div>
+            <h3>Novo Cliente</h3>
+            <p>Cadastrar clientes no sistema</p>
+        </div>
+
+        <?php if ($cargo == 'Gerente' || $cargo == 'Programador'): ?>
+            
+            <div class="card" onclick="location.href='estoque.php'" style="cursor:pointer; background: #2c3e50; color: white; padding: 30px; border-radius: 10px; text-align: center;">
+                <div style="font-size: 40px; margin-bottom: 10px;">📦</div>
+                <h3>Gestão de Estoque</h3>
+                <p>Reposição e inventário</p>
             </div>
+
+            <div class="card" onclick="location.href='funcionarios_gestao.php'" style="cursor:pointer; background: #8e44ad; color: white; padding: 30px; border-radius: 10px; text-align: center;">
+                <div style="font-size: 40px; margin-bottom: 10px;">👔</div>
+                <h3>Gestão de Equipe</h3>
+                <p>Funcionários e Comissões</p>
             </div>
-    </main>
-</body>
-</html>
+
+            <div class="card" onclick="location.href='configuracoes.php'" style="cursor:pointer; background: #7f8c8d; color: white; padding: 30px; border-radius: 10px; text-align: center;">
+                <div style="font-size: 40px; margin-bottom: 10px;">⚙️</div>
+                <h3>Configurações</h3>
+                <p>Categorias, Marcas e Cargos</p>
+            </div>
+
+        <?php endif; ?>
+
+    </div>
+</main>
+
+<?php include 'includes/footer.php'; ?>
