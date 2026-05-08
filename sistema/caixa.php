@@ -56,7 +56,6 @@ $clientes = mysqli_query($conexao, "SELECT id, nome FROM cliente");
                     <button onclick="finalizarVenda()" class="btn-finalizar">✅ Finalizar (F8)</button>
                 </div>
             </div>
-
         </div>
     </div>
 </main>
