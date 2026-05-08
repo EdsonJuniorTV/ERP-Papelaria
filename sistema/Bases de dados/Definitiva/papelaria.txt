@@ -302,42 +302,5 @@ from comissao c
 join funcionario f on c.id_func = f.id
 group by f.id;
 
-
-
-Estrutura das pasta (Quais arquivos manter):
-/papelaria (Pasta Raiz)
-│
-├── /config                 # Configurações centrais
-│   └── conexao.php         # Conexão única com o BD papelaria
-│
-├── /includes               # Códigos repetitivos e segurança
-│   ├── auth.php            # Verifica login e cargos (Gerente, Vendedor, etc)
-│   ├── header.php          # O menu dinâmico que você já tem (ajustado)
-│   └── footer.php          # Rodapé padrão
-│
-├── /public                 # Arquivos que o navegador acessa diretamente
-│   ├── /css
-│   │   ├── estilo.css      # Estilo original do cadastro
-│   │   ├── caixa.css       # Estilo do seu amigo para o PDV
-│   │   ├── header.css      # Estilo do menu superior
-│   │   └── cadastrar.css   # Estilo dos formulários CRUD
-│   ├── /js
-│   │   └── cadastrar.js    # Script de validação e máscaras (CPF/Fone)
-│   └── /assets             # Imagens, logos e ícones
-│
-├── /controllers            # Arquivos que processam dados (os "salvar")
-│   ├── api.php             # Ponte para o CRUD de funcionários
-│   ├── funcionario.php     # Lógica do CRUD (cadastrar, listar, excluir)
-│   ├── salvar_cliente.php  # Processa o cadastro de clientes
-│   ├── salvar_venda.php    # Processa o fechamento do pedido
-│   └── baixar_estoque.php  # Aciona a baixa (via Trigger do Banco)
-│
-├── index.php               # Landing Page (Novidades + Login)
-├── processa_login.php      # Verifica senha e cria a $_SESSION
-├── dashboard.php           # Menu Principal após o login
-├── caixa.php               # Tela de Vendas (o arquivo do seu amigo)
-├── clientes.php            # CRUD de Clientes (seu arquivo index.php antigo)
-├── estoque.php             # Visualização de produtos e fornecedores
-├── financeiro.php          # Relatórios de lucro (RESTRITO)
-├── funcionarios_gestao.php # CRUD de Funcionários (RESTRITO)
-└── logout.php              # Encerra a sessão e volta para o index
+insert into funcionario(id_cargo,id_end,cpf,nome,login,senha,dt_nasc,dt_admissao,fone,email)
+values(1,1,"00000000000","Programador","admin","123","1995-10-10","2010-10-10","00000000000","programador@gmail.com");
