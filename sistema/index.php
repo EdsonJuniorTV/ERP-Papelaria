@@ -3,39 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Papelaria Central - Bem-vindo</title>
-    <link rel="stylesheet" href="public/css/header.css">
-    <link rel="stylesheet" href="public/css/cadastrar.css">
+    <title>Papelaria Central</title>
+    <link rel="stylesheet" href="public/css/css.css">
     <style>
+        body { background: var(--bg); }
+
+        .login-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
         .hero {
-            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
-            color: white;
-            padding: 80px 20px;
+            background: linear-gradient(135deg, #0f172a 0%, #1a56db 100%);
+            padding: 60px 24px;
             text-align: center;
         }
-        .login-section {
-            background: #f4f7f6;
-            padding: 60px 20px;
+        .hero h1 {
+            color: #fff;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
         }
-        .card-noticia {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 15px;
+        .hero p {
+            color: rgba(255,255,255,.65);
+            margin-top: 8px;
+            font-size: .95rem;
+        }
+
+        .login-body {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 32px;
+            max-width: 1000px;
+            width: 100%;
+            margin: 40px auto;
+            padding: 0 24px 40px;
+        }
+
+        .noticias .card-noticia {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 20px 22px;
+            box-shadow: var(--shadow-sm);
+            border-left: 3px solid var(--brand);
+            margin-bottom: 16px;
+        }
+        .noticias .card-noticia h3 {
+            font-size: .95rem;
+            margin-bottom: 6px;
+        }
+        .noticias .card-noticia p {
+            font-size: .85rem;
+            color: var(--text-muted);
+        }
+
+        .login-card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 36px 32px;
+            box-shadow: var(--shadow-lg);
+            height: fit-content;
+        }
+        .login-card h2 {
+            text-align: center;
+            margin-bottom: 28px;
+            font-size: 1.3rem;
+        }
+        .login-card .form-group {
+            margin-bottom: 18px;
+        }
+        .login-card .form-group label {
+            font-size: .82rem;
+            font-weight: 600;
+            color: var(--text);
+            display: block;
+            margin-bottom: 6px;
+        }
+        .login-card .form-group input {
+            width: 100%;
+            padding: 10px 13px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            font-size: .9rem;
+            font-family: var(--font-sans);
+            transition: border-color .15s, box-shadow .15s;
+        }
+        .login-card .form-group input:focus {
+            outline: none;
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(26,86,219,.12);
+        }
+        .login-card .btn-submit {
+            width: 100%;
+            margin-top: 8px;
+            padding: 12px;
+            font-size: .95rem;
+            justify-content: center;
+        }
+        .login-card .hint {
+            text-align: center;
+            margin-top: 16px;
+            font-size: .78rem;
+            color: var(--text-light);
+        }
+
+        @media (max-width: 680px) {
+            .login-body { grid-template-columns: 1fr; }
+            .noticias { order: 2; }
+            .login-card { order: 1; }
         }
     </style>
 </head>
 <body>
+<div class="login-page">
 
     <header class="hero">
         <h1>✏️ Papelaria Central</h1>
         <p>Sistema Interno de Gestão de Vendas e Estoque</p>
     </header>
 
-    <main class="container" style="max-width: 1000px; display: grid; grid-template-columns: 1fr 400px; gap: 40px; margin-top: -40px;">
-        
-        <section>
+    <div class="login-body">
+
+        <section class="noticias">
             <div class="card-noticia">
                 <h3>📢 Comunicado Interno</h3>
                 <p>O inventário geral será realizado no próximo sábado. Certifiquem-se de atualizar todas as entradas de nota fiscal até sexta-feira.</p>
@@ -46,34 +139,33 @@
             </div>
         </section>
 
-        <section id="login" class="card" style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
-            <h2 style="text-align: center; margin-bottom: 20px;">Acesso Restrito</h2>
-            
+        <section class="login-card">
+            <h2>Acesso Restrito</h2>
             <form action="processa_login.php" method="POST">
                 <div class="form-group">
                     <label>Usuário / Login</label>
-                    <input type="text" name="login" required placeholder="Digite seu usuário" style="width: 100%; padding: 12px; margin-top: 5px;">
+                    <input type="text" name="login" required placeholder="Digite seu usuário">
                 </div>
-                
-                <div class="form-group" style="margin-top: 15px;">
+                <div class="form-group">
                     <label>Senha</label>
-                    <input type="password" name="senha" required placeholder="********" style="width: 100%; padding: 12px; margin-top: 5px;">
+                    <input type="password" name="senha" required placeholder="••••••••">
                 </div>
-
-                <button type="submit" class="btn-submit" style="width: 100%; margin-top: 25px; background: #27ae60;">
-                    🔓 Entrar no Sistema
-                </button>
+                <button type="submit" class="btn-submit">🔓 Entrar no Sistema</button>
             </form>
-
-            <script>
-                // Verifica erro de login via URL
-                const urlParams = new URLSearchParams(window.location.search);
-                if (urlParams.has('erro')) {
-                    alert('Usuário ou senha incorretos, ou conta inativa.');
-                }
-            </script>
+            <p class="hint">Para acesso, contate o administrador do sistema</p>
         </section>
 
-    </main>
+    </div>
 
-    <?php include 'includes/footer.php'; ?>
+</div>
+
+<?php include 'includes/footer.php'; ?>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('erro')) {
+        alert('Usuário ou senha incorretos, ou conta inativa.');
+    }
+</script>
+</body>
+</html>
