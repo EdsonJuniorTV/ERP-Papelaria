@@ -1,7 +1,7 @@
 <?php 
 require_once 'includes/auth.php';
 require_once 'config/conexao.php';
-include 'includes/header.php'; 
+include '../includes/header.php'; 
 
 // Carrega as opções dos selects do banco de dados
 $fornecedores = mysqli_query($conexao, "SELECT id, nome FROM fornecedor ORDER BY nome ASC");

@@ -2,6 +2,6 @@
         <p>&copy; <?= date('Y') ?> Papelaria Interna - Sistema de Gestão ERP</p>
     </footer>
     
-    <script src="public/scripts/cadastrar.js"></script>
+    <script src="public/js/cadastrar.js"></script>
 </body>
 </html>

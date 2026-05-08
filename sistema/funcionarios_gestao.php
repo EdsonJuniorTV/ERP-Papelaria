@@ -49,6 +49,11 @@ $cargos = mysqli_query($conexao, "SELECT * FROM cargo ORDER BY nome ASC");
                 </div>
 
                 <div class="form-group">
+                    <label>Data de Nascimento <span>*</span></label>
+                    <input type="date" name="dt_nasc">
+                </div>
+
+                <div class="form-group">
                     <label>Data de Admissão</label>
                     <input type="date" name="dt_admissao">
                 </div>
@@ -56,6 +61,11 @@ $cargos = mysqli_query($conexao, "SELECT * FROM cargo ORDER BY nome ASC");
                 <div class="form-group">
                     <label>Telefone</label>
                     <input type="text" id="fone" name="fone">
+                </div>
+
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="text" id="email" name="email">
                 </div>
 
                 <div class="form-group form-group-full">

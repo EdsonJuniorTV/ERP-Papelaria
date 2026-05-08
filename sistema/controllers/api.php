@@ -8,9 +8,9 @@ require_once '../config/conexao.php';
 require_once 'funcionario.php';
 require_once 'cliente.php';
 require_once 'fornecedor.php';
-require_once 'produto.php'; // Certifique-se de que este arquivo existe
+require_once 'produto.php'; 
 require_once 'estoque_entrada.php';
-require_once 'config.php'; // Contém cadastrarAuxiliar
+require_once 'config.php';
 
 $metodo = $_SERVER['REQUEST_METHOD'];
 $input = json_decode(file_get_contents('php://input'), true);
