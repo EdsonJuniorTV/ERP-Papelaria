@@ -61,5 +61,5 @@ $clientes = mysqli_query($conexao, "SELECT id, nome FROM cliente");
     </div>
 </main>
 
-<script src="/public/js/caixa.js"></script>
+<script src="public/js/caixa.js"></script>
 <?php include 'includes/footer.php'; ?>
