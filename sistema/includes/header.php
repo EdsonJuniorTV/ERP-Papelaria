@@ -36,6 +36,8 @@ $nome_usuario = $_SESSION['user_nome'] ?? 'Usuário';
                 <ul>
                     <li><a href="dashboard.php">📊 Dashboard</a></li>
                     <li><a href="caixa.php">🛒 Caixa</a></li>
+                    <li><a href="configuracoes.php">(:P) Configurações</a></li>
+                    <li><a href="cadastrar_produto.php">(:3) Produtos</a></li>
                     <li>
                         <a href="estoque.php">
                             📦 Estoque 
@@ -49,6 +51,7 @@ $nome_usuario = $_SESSION['user_nome'] ?? 'Usuário';
                     <li><a href="cadastro.php">👥 Clientes</a></li>
                     <li><a href="fornecedores_gestao.php">🚚 Fornecedores</a></li>
                     <li><a href="funcionarios_gestao.php">👔 RH</a></li>
+                    <li><a href="financeiro.php">(D) Financeiro</a><li>
                 </ul>
             </nav>
             <div class="user-info">
@@ -57,3 +60,5 @@ $nome_usuario = $_SESSION['user_nome'] ?? 'Usuário';
             </div>
         </div>
     </header>
+</body>
+</html>

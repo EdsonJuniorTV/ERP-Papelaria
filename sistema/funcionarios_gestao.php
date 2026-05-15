@@ -6,7 +6,6 @@ include 'includes/header.php';
 
 $cargos = mysqli_query($conexao, "SELECT * FROM cargo ORDER BY nome ASC");
 
-
 $funcionarios = mysqli_fetch_all(
     mysqli_query($conexao, "
         SELECT f.id, f.nome, f.login, f.cpf, f.fone, f.email, f.status,
@@ -22,7 +21,6 @@ $funcionarios = mysqli_fetch_all(
 <main>
     <div class="container">
 
-
         <div class="header" style="background: #8e44ad; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
             <div>
                 <h1>👔 Gestão de Funcionários</h1>
@@ -33,7 +31,6 @@ $funcionarios = mysqli_fetch_all(
                 + Novo Funcionário
             </button>
         </div>
-
 
         <div style="overflow-x:auto; margin-top:24px;">
             <table style="width:100%; border-collapse:collapse; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.08);">
@@ -107,7 +104,6 @@ $funcionarios = mysqli_fetch_all(
             </div>
 
             <form id="form" data-method="post">
-                <!-- Campo oculto: define se é edição ou cadastro -->
                 <input type="hidden" name="tipo_entidade" id="tipo_entidade" value="funcionario">
                 <input type="hidden" name="id" id="func_id" value="">
 
@@ -127,7 +123,6 @@ $funcionarios = mysqli_fetch_all(
                         <select name="id_cargo" id="func_cargo" required>
                             <option value="">Selecione...</option>
                             <?php 
-                            // Rebobina o resultado do cargo para usar aqui e no select de edição
                             mysqli_data_seek($cargos, 0);
                             while ($cargo = mysqli_fetch_assoc($cargos)): ?>
                                 <option value="<?= $cargo['id'] ?>"><?= htmlspecialchars($cargo['nome']) ?></option>
@@ -191,7 +186,6 @@ $funcionarios = mysqli_fetch_all(
 </main>
 
 <script>
-
 function abrirModal() {
     document.getElementById('modal-titulo').textContent = '👔 Novo Funcionário';
     document.getElementById('form').reset();
@@ -208,18 +202,15 @@ function abrirModal() {
 function abrirEdicao(func) {
     document.getElementById('modal-titulo').textContent = '✏️ Editando: ' + func.nome;
 
-
-    document.getElementById('func_id').value       = func.id;
-    document.getElementById('func_nome').value     = func.nome;
-    document.getElementById('func_cargo').value    = func.id_cargo;
-    document.getElementById('func_login').value    = func.login;
-    document.getElementById('fone').value = func.fone ?? '';
-    document.getElementById('func_email').value    = func.email   ?? '';
-
+    document.getElementById('func_id').value    = func.id;
+    document.getElementById('func_nome').value  = func.nome;
+    document.getElementById('func_cargo').value = func.id_cargo;
+    document.getElementById('func_login').value = func.login;
+    document.getElementById('fone').value       = func.fone  ?? '';
+    document.getElementById('func_email').value = func.email ?? '';
 
     const cpfRaw = func.cpf ?? '';
     document.getElementById('cpf').value = cpfRaw.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-
 
     document.getElementById('func_senha').value    = '';
     document.getElementById('func_senha').required = false;
@@ -232,10 +223,9 @@ function abrirEdicao(func) {
 }
 
 function fecharModal() {
-    document.getElementById('modal-overlay').style.display   = 'none';
+    document.getElementById('modal-overlay').style.display    = 'none';
     document.getElementById('modal-funcionario').style.display = 'none';
 }
-
 
 function confirmarExclusao(id, nome) {
     if (!confirm(`Desativar o funcionário "${nome}"?\n\nEle não será excluído, apenas marcado como Inativo.`)) return;
@@ -252,7 +242,6 @@ function confirmarExclusao(id, nome) {
     })
     .catch(() => alert('Erro de comunicação com o servidor.'));
 }
-
 
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fecharModal(); });
 </script>

@@ -65,7 +65,7 @@ include 'includes/header.php';    // Traz o Menu e o CSS
                         <option value="RJ">Rio de Janeiro</option>
                         <option value="MG">Minas Gerais</option>
                         <option value="PR">Paraná</option>
-                        </select>
+                    </select>
                 </div>
             </div>
 

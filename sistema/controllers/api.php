@@ -13,7 +13,7 @@ require_once 'config.php';
 $metodo = $_SERVER['REQUEST_METHOD'];
 $input  = json_decode(file_get_contents('php://input'), true);
 
-
+// Fallback para formulários tradicionais (não-JSON)
 if ($metodo !== 'GET' && empty($input)) {
     $input = $_POST;
 }
@@ -56,8 +56,6 @@ try {
                     $resposta = cadastrarFuncionario($input, $conexao);
                     break;
 
-                // ── NOVO: Edição de funcionário via POST ─────────
-                // (o cadastrar.js usa POST para tudo; o tipo diferencia a ação)
                 case 'editar_funcionario':
                     if (empty($input['id'])) {
                         $resposta = ["status" => false, "mensagem" => "ID do funcionário não informado."];
@@ -71,7 +69,6 @@ try {
             }
             break;
 
-
         case 'PUT':
             if (empty($input['id'])) {
                 $resposta = ["status" => false, "mensagem" => "ID do funcionário não informado."];
@@ -80,7 +77,6 @@ try {
             $resposta = editarFuncionario($input, $conexao);
             break;
 
-
         case 'DELETE':
             if (empty($input['id'])) {
                 $resposta = ["status" => false, "mensagem" => "ID não informado para exclusão."];
@@ -88,7 +84,6 @@ try {
             }
             $resposta = excluirFuncionario((int)$input['id'], $conexao);
             break;
-
 
         case 'GET':
             $tipo = $_GET['tipo'] ?? '';

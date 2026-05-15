@@ -64,6 +64,7 @@ if(isset($_POST['cadastrar_produto'])){
                 throw new Exception("Erro ao gerar ID do produto");
             }
 
+            // INSERT para novo produto (o trigger cria o estoque, mas inserimos com qtd inicial)
             mysqli_query($conexao,"
                 INSERT INTO estoque (id_prod,qtd,qtd_minima)
                 VALUES ($idProduto,$qtd,$qtd_minima)
