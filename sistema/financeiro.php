@@ -24,15 +24,15 @@ $lucro = $dados['total_entradas'] - $dados['total_saidas'];
     <div class="grid-cards" style="margin-top: 20px;">
         <div class="card" style="border-left: 5px solid green;">
             <h4>Entradas (Vendas)</h4>
-            <p style="font-size: 24px;">R$ <?= number_format($dados['total_entradas'], 2, ',', '.') ?></p>
+            <p style="font-size: 24px; color: #000000">R$ <?= number_format($dados['total_entradas'], 2, ',', '.') ?></p>
         </div>
         <div class="card" style="border-left: 5px solid red;">
             <h4>Saídas (Custos/Comissões)</h4>
-            <p style="font-size: 24px;">R$ <?= number_format($dados['total_saidas'], 2, ',', '.') ?></p>
+            <p style="font-size: 24px; color: #000000">R$ <?= number_format($dados['total_saidas'], 2, ',', '.') ?></p>
         </div>
-        <div class="card" style="background: #f1f1f1;">
+        <div class="card" style="background: #dad8d8;">
             <h4>Saldo Líquido</h4>
-            <p style="font-size: 24px; font-weight: bold;">R$ <?= number_format($lucro, 2, ',', '.') ?></p>
+            <p style="font-size: 24px; font-weight: bold; color: #000000">R$ <?= number_format($lucro, 2, ',', '.') ?></p>
         </div>
     </div>
 </main>

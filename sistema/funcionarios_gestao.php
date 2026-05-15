@@ -76,8 +76,11 @@ $cargos = mysqli_query($conexao, "SELECT * FROM cargo ORDER BY nome ASC");
                 <input type="hidden" name="estado" value="SP">
                 <input type="hidden" name="cep" value="00000000">
             </div>
-
-            <button type="submit" class="btn-submit">💾 Salvar Funcionário</button>
+            
+            <div style="margin-top: 20px;">
+                <button type="submit" class="btn-submit">💾 Salvar Funcionário</button>
+                <button type="reset" class="btn-submit" style="background: #95a5a6; margin-left: 10px;">Limpar</button>
+            </div>
         </form>
     </div>
 </main>

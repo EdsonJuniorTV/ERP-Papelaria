@@ -32,7 +32,6 @@
                     <button type="submit" style="background: #3498db; color:white; border:none; padding:5px 10px; cursor:pointer;">+</button>
                 </form>
             </section>
-
         </div>
     </div>
 </main>

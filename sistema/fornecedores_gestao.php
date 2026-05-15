@@ -48,8 +48,11 @@ include 'includes/header.php';
                 <input type="hidden" name="cidade" value="Bauru">
                 <input type="hidden" name="estado" value="SP">
             </div>
-
-            <button type="submit" class="btn-submit">💾 Cadastrar Fornecedor</button>
+            
+            <div style="margin-top: 20px;">
+                <button type="submit" class="btn-submit">💾 Cadastrar Fornecedor</button>
+                <button type="reset" class="btn-submit" style="background: #95a5a6; margin-left: 10px;">Limpar</button>
+            </div>
         </form>
     </div>
 </main>

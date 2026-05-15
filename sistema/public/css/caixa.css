@@ -1,0 +1,210 @@
+:root{ 
+  --bg:#0f172a; --card:#0b1223; --muted:#94a3b8; --text:#e5e7eb;
+  --line:#1f2a44; --btn:#2563eb; --ok:#16a34a; --err:#ef4444;
+}
+
+*{ box-sizing:border-box; font-family: system-ui, Arial, sans-serif; }
+
+body{
+  margin:0;
+  background:linear-gradient(120deg,#0b1020, #0f172a);
+  color:var(--text);
+}
+
+.wrap{ max-width:1100px; margin:0 auto; padding:18px; }
+
+h1{ margin:0 0 15px; }
+
+.grid{
+  display:grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap:14px;
+}
+
+.card{
+  background:rgba(11,18,35,0.9);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:14px;
+}
+
+.row{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  margin:10px 0;
+}
+
+input, select{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:#0a1020;
+  color:var(--text);
+}
+
+.table{
+  border:1px solid var(--line);
+  border-radius:12px;
+  overflow:hidden;
+}
+
+.thead, .tr{
+  display:grid;
+  grid-template-columns: 0.7fr 2.2fr 1fr 1fr 0.6fr;
+  gap:10px;
+  padding:10px;
+}
+
+.thead{
+  background:#081022;
+  color:var(--muted);
+}
+
+.tbody .tr{
+  border-top:1px solid var(--line);
+}
+
+.btn{
+  background:var(--btn);
+  border:none;
+  color:white;
+  padding:8px 10px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.btn.ok{ background:var(--ok); }
+.btn.ghost{ background:transparent; border:1px solid var(--line); }
+.btn.tiny{ padding:4px 8px; }
+
+.totals{ margin-top:10px; }
+
+.line{
+  display:flex;
+  justify-content:space-between;
+  margin:6px 0;
+  color:var(--muted);
+}
+
+.line b{ color:var(--text); }
+
+.line.big{ font-size:18px; }
+
+.msg{
+  margin-top:10px;
+  text-align:center;
+  font-weight:600;
+  color:#86efac;
+  min-height:20px;
+}
+
+#preview-produto{
+  margin:10px 0;
+  padding:10px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  color:#86efac;
+  font-size:14px;
+  background:#081022;
+}
+
+#comanda{
+  margin-bottom:10px;
+}
+
+#msg-retorno{
+  margin-top:10px;
+  color:#86efac;
+  font-size:14px;
+}
+
+#lista-comanda, #resumo-comanda{
+  font-size:14px;
+  line-height:1.6;
+}
+
+#msg{
+  margin-top:10px;
+  font-weight:bold;
+}
+
+#tela2{
+  gap:20px;
+  margin-top:20px;
+}
+
+#tela2 .card{
+  padding:20px;
+  border-radius:16px;
+}
+
+#tela2 h2{
+  margin-bottom:15px;
+  font-size:20px;
+}
+
+#resumo-comanda{
+  background:#081022;
+  padding:15px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  line-height:1.8;
+}
+
+#tela2 .card div{
+  margin-bottom:12px;
+}
+
+#tela2 input,
+#tela2 select{
+  margin-top:8px;
+  margin-bottom:15px;
+  padding:12px;
+  font-size:15px;
+}
+
+#ganho-func{
+  margin:10px 0 15px 0;
+  padding:12px;
+  border-radius:10px;
+  background:#081022;
+  border:1px solid var(--line);
+  color:#86efac;
+  font-weight:600;
+}
+
+#troco{
+  font-size:18px;
+  font-weight:bold;
+}
+
+#msg{
+  margin-top:15px;
+  padding:10px;
+  border-radius:10px;
+  background:#081022;
+  border:1px solid var(--line);
+}
+
+#tela2 button{
+  margin-top:15px;
+  padding:12px;
+  font-size:16px;
+  width:100%;
+}
+
+#msg-parcelas,
+#msg-forma,
+#valor-parcela{
+  margin:8px 0;
+  font-weight:bold;
+  color:#86efac;
+}
+
+@media (max-width: 900px){
+  .grid{
+    grid-template-columns:1fr;
+  }
+}

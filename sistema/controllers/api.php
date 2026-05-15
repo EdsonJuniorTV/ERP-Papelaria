@@ -18,9 +18,7 @@ $input = json_decode(file_get_contents('php://input'), true);
 // Se não for GET e o input estiver vazio (via fetch JSON)
 if ($metodo !== 'GET' && empty($input)) {
     $input = $_POST; // Fallback para formulários tradicionais
-}
 
-if ($metodo !== 'GET' && empty($input)) {
     echo json_encode(["status" => false, "mensagem" => "Nenhum dado recebido."]);
     exit;
 }
@@ -32,18 +30,27 @@ try {
         case 'POST':
             $tipo = $input['tipo_entidade'] ?? '';
 
-            if ($tipo == 'produto') {
-                $resposta = cadastrarProduto($input, $conexao);
-            } elseif ($tipo == 'entrada_estoque') {
-                $resposta = registrarEntradaEstoque($input['id_prod'], $input['qtd'], $conexao);
-            } elseif ($tipo == 'auxiliar') {
-                $resposta = cadastrarAuxiliar($input['tabela'], $input['nome'], $conexao);
-            } elseif ($tipo == 'cliente') {
-                $resposta = cadastrarCliente($input, $conexao);
-            } elseif ($tipo == 'fornecedor') {
-                $resposta = cadastrarFornecedor($input, $conexao);
-            } elseif ($tipo == 'funcionario') {
-                $resposta = cadastrarFuncionario($input, $conexao);
+            switch ($tipo) {
+                case 'produto':
+                    $resposta = cadastrarProduto($input, $conexao);
+                    break;
+                case 'entrada_estoque':
+                    $resposta = registrarEntradaEstoque($input['id_prod'], $input['qtd'], $conexao);
+                    break;
+                case 'auxiliar':
+                    $resposta = cadastrarAuxiliar($input['tabela'], $input['nome'], $conexao);
+                    break;
+                case 'cliente':
+                    $resposta = cadastrarCliente($input, $conexao);
+                    break;
+                case 'fornecedor':
+                    $resposta = cadastrarFornecedor($input, $conexao);
+                    break;
+                case 'funcionario':
+                    $resposta = cadastrarFuncionario($input, $conexao);
+                    break;
+                default:
+                    throw new Exception("O tipo de POST não foi encontrado.");
             }
             break;
 

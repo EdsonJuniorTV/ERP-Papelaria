@@ -1,7 +1,4 @@
 <?php
-/**
- * Função para cadastrar um novo produto e inicializar o estoque
- */
 function cadastrarProduto($dados, $conn) {
     try {
         // 1. Iniciar uma Transação (Garante que se o estoque falhar, o produto não seja salvo sozinho)
@@ -30,7 +27,9 @@ function cadastrarProduto($dados, $conn) {
         $id_novo_produto = $conn->insert_id;
 
         // 5. Criar o registro na tabela Estoque com quantidade ZERO
-        $sqlEstoque = "INSERT INTO estoque (id_prod, qtd, qtd_minima) VALUES (?, 0, ?)";
+        $sqlEstoque = "INSERT INTO estoque (id_prod, qtd, qtd_minima) 
+        VALUES (?, 0, ?) on duplicate key update qtd_minima = values(qtd_minima)";
+
         $stmtEstoque = $conn->prepare($sqlEstoque);
         $stmtEstoque->bind_param("ii", $id_novo_produto, $qtd_minima);
 
