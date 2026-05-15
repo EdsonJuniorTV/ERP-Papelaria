@@ -47,6 +47,7 @@ if(isset($_POST['cadastrar_produto'])){
 
             mysqli_query($conexao,"
                 UPDATE estoque SET
+                    qtd = $qtd,
                     qtd_minima = $qtd_minima
                 WHERE id_prod = $idProduto
             ");
@@ -344,6 +345,8 @@ function editarProduto(p){
     document.querySelector('[name="nome"]').value = p.nome;
     document.querySelector('[name="preco"]').value = p.preco;
     document.querySelector('[name="custo"]').value = p.custo;
+    
+    document.querySelector('[name="qtd"]').value = p.qtd;
     document.querySelector('[name="qtd_minima"]').value = p.qtd_minima;
 
     document.querySelector('[name="categoria"]').value = p.id_cat;
