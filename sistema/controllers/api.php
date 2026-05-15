@@ -1,10 +1,8 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 
-// Caminhos ajustados partindo da pasta controllers para a config
 require_once '../config/conexao.php';
 
-// Importação de todos os controladores de lógica
 require_once 'funcionario.php';
 require_once 'cliente.php';
 require_once 'fornecedor.php';
@@ -13,11 +11,11 @@ require_once 'estoque_entrada.php';
 require_once 'config.php';
 
 $metodo = $_SERVER['REQUEST_METHOD'];
-$input = json_decode(file_get_contents('php://input'), true);
+$input  = json_decode(file_get_contents('php://input'), true);
 
-// Se não for GET e o input estiver vazio (via fetch JSON)
+
 if ($metodo !== 'GET' && empty($input)) {
-    $input = $_POST; // Fallback para formulários tradicionais
+    $input = $_POST;
 }
 
 if ($metodo !== 'GET' && empty($input)) {
@@ -29,29 +27,75 @@ try {
     $resposta = ["status" => false, "mensagem" => "Ação não definida."];
 
     switch ($metodo) {
+
         case 'POST':
             $tipo = $input['tipo_entidade'] ?? '';
 
-            if ($tipo == 'produto') {
-                $resposta = cadastrarProduto($input, $conexao);
-            } elseif ($tipo == 'entrada_estoque') {
-                $resposta = registrarEntradaEstoque($input['id_prod'], $input['qtd'], $conexao);
-            } elseif ($tipo == 'auxiliar') {
-                $resposta = cadastrarAuxiliar($input['tabela'], $input['nome'], $conexao);
-            } elseif ($tipo == 'cliente') {
-                $resposta = cadastrarCliente($input, $conexao);
-            } elseif ($tipo == 'fornecedor') {
-                $resposta = cadastrarFornecedor($input, $conexao);
-            } elseif ($tipo == 'funcionario') {
-                $resposta = cadastrarFuncionario($input, $conexao);
+            switch ($tipo) {
+                case 'produto':
+                    $resposta = cadastrarProduto($input, $conexao);
+                    break;
+
+                case 'entrada_estoque':
+                    $resposta = registrarEntradaEstoque($input['id_prod'], $input['qtd'], $conexao);
+                    break;
+
+                case 'auxiliar':
+                    $resposta = cadastrarAuxiliar($input['tabela'], $input['nome'], $conexao);
+                    break;
+
+                case 'cliente':
+                    $resposta = cadastrarCliente($input, $conexao);
+                    break;
+
+                case 'fornecedor':
+                    $resposta = cadastrarFornecedor($input, $conexao);
+                    break;
+
+                case 'funcionario':
+                    $resposta = cadastrarFuncionario($input, $conexao);
+                    break;
+
+                // ── NOVO: Edição de funcionário via POST ─────────
+                // (o cadastrar.js usa POST para tudo; o tipo diferencia a ação)
+                case 'editar_funcionario':
+                    if (empty($input['id'])) {
+                        $resposta = ["status" => false, "mensagem" => "ID do funcionário não informado."];
+                        break;
+                    }
+                    $resposta = editarFuncionario($input, $conexao);
+                    break;
+
+                default:
+                    $resposta = ["status" => false, "mensagem" => "Tipo de entidade desconhecido: $tipo"];
             }
             break;
 
+
+        case 'PUT':
+            if (empty($input['id'])) {
+                $resposta = ["status" => false, "mensagem" => "ID do funcionário não informado."];
+                break;
+            }
+            $resposta = editarFuncionario($input, $conexao);
+            break;
+
+
+        case 'DELETE':
+            if (empty($input['id'])) {
+                $resposta = ["status" => false, "mensagem" => "ID não informado para exclusão."];
+                break;
+            }
+            $resposta = excluirFuncionario((int)$input['id'], $conexao);
+            break;
+
+
         case 'GET':
             $tipo = $_GET['tipo'] ?? '';
-            if ($tipo == 'cliente') {
+
+            if ($tipo === 'cliente') {
                 $resposta = listarClientes($conexao);
-            } elseif ($tipo == 'fornecedor') {
+            } elseif ($tipo === 'fornecedor') {
                 $resposta = listarFornecedores($conexao);
             } else {
                 $resposta = listarFuncionarios($conexao);
@@ -59,7 +103,7 @@ try {
             break;
 
         default:
-            throw new Exception("Método $metodo não suportado.");
+            throw new Exception("Método HTTP '$metodo' não suportado.");
     }
 
     echo json_encode($resposta);

@@ -76,7 +76,7 @@ async function finalizarVenda() {
 
     try {
         // PASSO 1: Criar o Pedido Master
-        const resPedido = await fetch('controllers/salvar_venda.php', {
+        const resPedido = await fetch('/papelaria/ERP-Papelaria/sistema/controllers/salvar_venda.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dadosVenda)
@@ -99,7 +99,7 @@ async function finalizarVenda() {
             formItem.append('qtd', item.qtd);
             formItem.append('preco', item.preco);
 
-            const resItem = await fetch('controllers/baixar_estoque.php', {
+            const resItem = await fetch('/papelaria/ERP-Papelaria/sistema/controllers/baixar_estoque.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: formItem.toString()

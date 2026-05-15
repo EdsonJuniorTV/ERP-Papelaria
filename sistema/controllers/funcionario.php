@@ -51,3 +51,33 @@ function listarFuncionarios($conn) {
     $res = $conn->query("SELECT f.*, c.nome as cargo FROM funcionario f JOIN cargo c ON f.id_cargo = c.id");
     return $res->fetch_all(MYSQLI_ASSOC);
 }
+
+function editarFuncionario($data, $conn) {
+    try {
+        $sql = "UPDATE funcionario SET id_cargo = ?, nome = ?, login = ?, fone = ?, email = ? WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("issssi", $data['id_cargo'], $data['nome'], $data['login'], $data['fone'], $data['email'], $data['id']);
+        
+        if ($stmt->execute()) {
+            return ["status" => true, "mensagem" => "Funcionário atualizado com sucesso!"];
+        }
+        throw new Exception($stmt->error);
+    } catch (Exception $e) {
+        return ["status" => false, "mensagem" => "Erro ao editar: " . $e->getMessage()];
+    }
+}
+
+function excluirFuncionario($id, $conn) {
+    try {
+        $sql = "UPDATE funcionario SET status = 'Inativo' WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $id);
+        
+        if ($stmt->execute()) {
+            return ["status" => true, "mensagem" => "Funcionário removido com sucesso!"];
+        }
+        throw new Exception($stmt->error);
+    } catch (Exception $e) {
+        return ["status" => false, "mensagem" => "Erro ao excluir: " . $e->getMessage()];
+    }
+}

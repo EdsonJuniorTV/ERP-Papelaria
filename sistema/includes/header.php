@@ -23,7 +23,7 @@ $nome_usuario = $_SESSION['user_nome'] ?? 'Usuário';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="/ERP-Papelaria/sistema/public/css/css.css">
+    <link rel="stylesheet" href="/papelaria/ERP-Papelaria/sistema/public/css/css.css">
     <title>Papelaria - Gestão</title>
 </head>
 <body>

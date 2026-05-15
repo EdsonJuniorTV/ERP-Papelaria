@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit;
     } else {
         // Se errar, volta para o index com um alerta de erro
-        header("Location: index.html?erro=1#login");
+        header("Location: index.php?erro=1#login");
         exit;
     }
 }
