@@ -1,5 +1,5 @@
 :root{ 
-  --bg:#ffffff; --card:#ffffff; --muted:#94a3b8; --text:#e5e7eb;
+  --bg:#ffffff; --card:#ffffff; --muted:#535353; --text:#000000;
   --line:#1f2a44; --btn:#2563eb; --ok:#16a34a; --err:#ef4444;
 }
 
@@ -22,7 +22,7 @@ h1{ margin:0 0 15px; }
 }
 
 .card{
-  background:rgba(255, 255, 255, 0.9);
+  background:rgba(243, 243, 243, 0.9);
   border:1px solid var(--line);
   border-radius:14px;
   padding:14px;
