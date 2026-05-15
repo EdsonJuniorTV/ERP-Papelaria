@@ -29,7 +29,7 @@ function cadastrarFuncionario($data, $conn) {
             $data['senha'], 
             $data['dt_nasc'], 
             $data['dt_admissao'], 
-            $status, 
+            $status,
             $data['fone'], 
             $data['email']
         );

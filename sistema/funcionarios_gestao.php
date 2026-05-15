@@ -230,7 +230,7 @@ function fecharModal() {
 function confirmarExclusao(id, nome) {
     if (!confirm(`Desativar o funcionário "${nome}"?\n\nEle não será excluído, apenas marcado como Inativo.`)) return;
 
-    fetch('/papelaria/ERP-Papelaria/sistema/controllers/api.php', {
+    fetch('/ERP-Papelaria/sistema/controllers/api.php', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: id })

@@ -23,7 +23,7 @@ $nome_usuario = $_SESSION['user_nome'] ?? 'Usuário';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="/papelaria/ERP-Papelaria/sistema/public/css/css.css">
+    <link rel="stylesheet" href="/ERP-Papelaria/sistema/public/css/css.css">
     <title>Papelaria - Gestão</title>
 </head>
 <body>
@@ -36,8 +36,7 @@ $nome_usuario = $_SESSION['user_nome'] ?? 'Usuário';
                 <ul>
                     <li><a href="dashboard.php">📊 Dashboard</a></li>
                     <li><a href="caixa.php">🛒 Caixa</a></li>
-                    <li><a href="configuracoes.php">(:P) Configurações</a></li>
-                    <li><a href="cadastrar_produto.php">(:3) Produtos</a></li>
+                    <li><a href="configuracoes.php">⚙ Configurações</a></li>
                     <li>
                         <a href="estoque.php">
                             📦 Estoque 
@@ -51,7 +50,6 @@ $nome_usuario = $_SESSION['user_nome'] ?? 'Usuário';
                     <li><a href="cadastro.php">👥 Clientes</a></li>
                     <li><a href="fornecedores_gestao.php">🚚 Fornecedores</a></li>
                     <li><a href="funcionarios_gestao.php">👔 RH</a></li>
-                    <li><a href="financeiro.php">(D) Financeiro</a><li>
                 </ul>
             </nav>
             <div class="user-info">

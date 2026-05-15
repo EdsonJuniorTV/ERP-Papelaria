@@ -1,4 +1,4 @@
-const url = "/papelaria/ERP-Papelaria/sistema/controllers/api.php"; 
+const url = "/ERP-Papelaria/sistema/controllers/api.php"; 
 const form = document.getElementById("form");
 
 // Máscaras de CPF, Telefone e CEP
