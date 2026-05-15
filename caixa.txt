@@ -1,0 +1,220 @@
+<?php
+include("conexao.php");
+
+$sqlProdutos = mysqli_query($conexao,"
+SELECT SUM(preco_custo * estoque_atual) as total
+FROM produtos
+");
+
+$dProdutos = mysqli_fetch_assoc($sqlProdutos);
+
+$investimento_produtos = $dProdutos['total'] ?? 0;
+
+$salarios_funcionarios = 26800;
+
+$investimento_total = $investimento_produtos + $salarios_funcionarios;
+
+$meta = $investimento_total + 2000;
+
+$sqlVendas = mysqli_query($conexao,"
+SELECT 
+SUM(total) as total_vendas,
+SUM(comissao) as total_comissao
+FROM vendas
+");
+
+$dVendas = mysqli_fetch_assoc($sqlVendas);
+
+$total_vendas = $dVendas['total_vendas'] ?? 0;
+
+$total_comissao = $dVendas['total_comissao'] ?? 0;
+
+$caixa_final = $total_vendas - $total_comissao;
+
+$resultado = $caixa_final - $investimento_total;
+?>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Financeiro</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#0f172a;
+color:white;
+padding:30px;
+}
+
+.card{
+background:#111827;
+padding:25px;
+border-radius:15px;
+max-width:700px;
+margin:auto;
+}
+
+h1{
+margin-bottom:30px;
+}
+
+.item{
+margin-bottom:25px;
+padding:15px;
+background:#1f2937;
+border-radius:10px;
+}
+
+.valor{
+font-size:24px;
+font-weight:bold;
+margin-top:10px;
+color:#86efac;
+}
+
+.prejuizo{
+color:#ef4444;
+}
+
+.lucro{
+color:#22c55e;
+}
+
+a{
+display:inline-block;
+margin-top:20px;
+padding:12px 20px;
+background:#2563eb;
+color:white;
+text-decoration:none;
+border-radius:10px;
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="card">
+
+<h1>Financeiro da Loja</h1>
+
+<div class="item">
+
+<div>
+Investimento total em produtos:
+</div>
+
+<div class="valor">
+R$ <?php echo number_format($investimento_produtos,2,',','.'); ?>
+</div>
+
+</div>
+
+<div class="item">
+
+<div>
+Salários dos funcionários:
+</div>
+
+<div class="valor">
+R$ <?php echo number_format($salarios_funcionarios,2,',','.'); ?>
+</div>
+
+</div>
+
+<div class="item">
+
+<div>
+Investimento total da empresa:
+</div>
+
+<div class="valor">
+R$ <?php echo number_format($investimento_total,2,',','.'); ?>
+</div>
+
+</div>
+
+<div class="item">
+
+<div>
+Meta da loja:
+</div>
+
+<div class="valor">
+R$ <?php echo number_format($meta,2,',','.'); ?>
+</div>
+
+</div>
+
+<div class="item">
+
+<div>
+Total vendido:
+</div>
+
+<div class="valor">
+R$ <?php echo number_format($total_vendas,2,',','.'); ?>
+</div>
+
+</div>
+
+<div class="item">
+
+<div>
+Comissão paga aos funcionários:
+</div>
+
+<div class="valor">
+R$ <?php echo number_format($total_comissao,2,',','.'); ?>
+</div>
+
+</div>
+
+<div class="item">
+
+<div>
+Dinheiro real em caixa:
+</div>
+
+<div class="valor">
+R$ <?php echo number_format($caixa_final,2,',','.'); ?>
+</div>
+
+</div>
+
+<div class="item">
+
+<div>
+Resultado final:
+</div>
+
+<div class="valor <?php echo $resultado >= 0 ? 'lucro' : 'prejuizo'; ?>">
+
+<?php
+if($resultado >= 0){
+
+echo "Lucro de R$ ".number_format($resultado,2,',','.');
+
+}else{
+
+echo "Prejuízo de R$ ".number_format(abs($resultado),2,',','.');
+
+}
+?>
+
+</div>
+
+</div>
+
+<a href="caixa.php">
+Voltar ao Caixa
+</a>
+
+</div>
+
+</body>
+</html>
