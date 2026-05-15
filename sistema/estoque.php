@@ -65,8 +65,10 @@ if(isset($_POST['cadastrar_produto'])){
             }
 
             mysqli_query($conexao,"
-                INSERT INTO estoque (id_prod,qtd,qtd_minima)
-                VALUES ($idProduto,$qtd,$qtd_minima)
+                UPDATE estoque SET
+                    qtd = $qtd,
+                    qtd_minima = $qtd_minima
+                WHERE id_prod = $idProduto
             ");
         }
 
