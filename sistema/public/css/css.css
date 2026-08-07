@@ -190,7 +190,7 @@ main { flex: 1; padding: 28px 32px; }
 
 /* Compatibilidade com o antigo .header dentro de .container */
 .container .header {
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  border-radius:  10px;
   padding: 22px 28px;
   color: #fff;
   background: var(--brand) !important; /* fallback; inline styles sobrepõem */
@@ -200,8 +200,12 @@ main { flex: 1; padding: 28px 32px; }
 
 /* ── Container / Card ──────────────────────────────────────── */
 .container {
-  max-width: 960px;
-  margin: 0 auto;
+  width: 100%; /* ← O segredo está aqui: obriga o container a esticar */
+   /* Aumentei um pouco para caberem mais cards lado a lado */
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   background: var(--surface);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
@@ -219,14 +223,32 @@ main { flex: 1; padding: 28px 32px; }
   box-shadow: var(--shadow-sm);
 }
 
+.dashboard-container {
+  width: 95%;
+  
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: white;
+  border-radius: 10px;
+}
+
+
+
+
 /* ── Grid de cards (dashboard) ─────────────────────────────── */
 .grid-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  display: flex; /* Mudamos de grid para flex para forçar a linha única */
+  flex-direction: row; 
   gap: 18px;
   padding: 28px;
+  overflow-x: auto; /* Cria uma barrinha de rolagem horizontal se a tela for pequena */
+
 }
 .grid-cards .card {
+  flex: 1; /* Faz os cards dividirem o espaço igualmente */
+  min-width: 200px; /* Impede que o card fique fino demais e quebre o texto */
   cursor: pointer;
   border: none;
   border-radius: var(--radius);
