@@ -1,1 +1,72 @@
 Teste
+Para compor uma Nota Fiscal Eletrônica (NF-e) ou Nota Fiscal de Consumidor (NFC-e) de forma válida perante a Receita Federal e a Secretaria da Fazenda (SEFAZ), o arquivo XML gerado pelo seu sistema deve conter uma estrutura rígida de dados dividida em blocos principais.
+
+Abaixo estão os blocos e os campos obrigatórios exigidos pelo padrão brasileiro:
+
+1. Dados do Emitente (A Papelaria / Sua Empresa)
+São as informações da empresa que está vendendo os produtos de papelaria:
+
+CNPJ (Cadastro Nacional da Pessoa Jurídica)
+
+Razão Social e Nome Fantasia
+
+Inscrição Estadual (IE)
+
+Endereço Completo (Logradouro, número, bairro, CEP, município e UF)
+
+Código de Regime Tributário (CRT) (Ex: Simples Nacional, Regime Normal)
+
+2. Dados do Destinatário (O Cliente)
+São as informações de quem está comprando (onde entra o CPF que conversamos):
+
+CPF ou CNPJ (Identificação fiscal do comprador)
+
+Nome / Razão Social
+
+Endereço Completo (Obrigatório para NF-e de e-commerce/transporte de mercadorias)
+
+E-mail (Opcional para a SEFAZ, mas altamente recomendado para envio automático do XML/DANFE ao cliente)
+
+3. Dados da Operação e Cabeçalho
+Controlam o controle cronológico e fiscal da venda:
+
+Natureza da Operação (Ex: "Venda de mercadoria adquirida de terceiros")
+
+Modelo da Nota (Ex: 55 para NF-e tradicional ou 65 para NFC-e de cupom fiscal eletrônico)
+
+Número da Nota e Série
+
+Data e Hora de Emissão
+
+4. Detalhes dos Produtos (Itens da Nota)
+Para cada produto adicionado ao carrinho da papelaria (como um caderno ou uma caixa de lápis), o sistema precisa informar:
+
+Código do Produto (Identificador interno no seu banco de dados)
+
+Descrição do Produto (Nome claro do item)
+
+NCM (Nomenclatura Comum do Mercosul — código de 8 dígitos que classifica o tipo de produto para fins fiscais)
+
+CFOP (Código Fiscal de Operações e Prestações — indica se a venda é dentro do estado ou interestadual)
+
+Unidade Comercial (Ex: UN, PCT, CX)
+
+Quantidade e Valor Unitário
+
+Valor Total do Item
+
+5. Totais e Tributos (Impostos)
+O governo exige o cálculo e o agrupamento dos impostos incidentes sobre a venda:
+
+Base de Cálculo e Valor do ICMS (Imposto sobre Circulação de Mercadorias e Serviços)
+
+Valores de PIS e COFINS
+
+Valor Total da Nota (Soma de todos os produtos + frete, se houver)
+
+6. Informações de Pagamento
+Como o cliente pagou a compra:
+
+Meio de Pagamento (Dinheiro, Cartão de Crédito, Pix, Boleto)
+
+Valor Pago em cada modalidade

@@ -98,6 +98,7 @@ if(isset($_POST['entrada_mercadoria'])){
     exit;
 }
 
+/*Filtro da aparência do estoque*/
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $filtro_fornecedor = isset($_GET['fornecedor']) ? intval($_GET['fornecedor']) : 0;
 $filtro_marca = isset($_GET['marca']) ? intval($_GET['marca']) : 0;
