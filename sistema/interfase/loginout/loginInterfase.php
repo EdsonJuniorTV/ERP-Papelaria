@@ -1,0 +1,3 @@
+<?php
+    // Entrada do usuário
+?>

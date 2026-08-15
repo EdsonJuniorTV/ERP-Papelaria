@@ -1,4 +1,5 @@
 <?php
+// Deve ser alterado para que as regras de negócio se torner exclusivas do Interfase
 // O __DIR__ garante que ele sempre ache a pasta config, não importa de onde o header seja chamado
 require_once __DIR__ . '/../config/conexao.php';
 

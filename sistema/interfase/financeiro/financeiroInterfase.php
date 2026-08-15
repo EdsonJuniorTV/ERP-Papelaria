@@ -1,0 +1,3 @@
+<?php
+    // Finanças da papelaria
+?>

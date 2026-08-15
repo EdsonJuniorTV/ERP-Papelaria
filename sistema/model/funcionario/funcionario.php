@@ -1,0 +1,3 @@
+<?php
+    // Modelo do funcionario
+?>

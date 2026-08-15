@@ -1,3 +1,4 @@
+// Deve ser observado para acrescentá-lo as regras de negócio ou ao controller
 const url = "controllers/api.php"; 
 const form = document.getElementById("form");
 
