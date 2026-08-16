@@ -7,7 +7,7 @@
     $conexao = mysqli_connect(host,user,pass,db);
 
     if (!$conexao) {
-        die("Erro de coneão com o banco de dados: " . mysqli_connect_error());
+        die("Erro de conexão com o banco de dados: " . mysqli_connect_error());
     }
 
     mysqli_set_charset($conexao, "utf8mb4");

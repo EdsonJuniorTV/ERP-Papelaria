@@ -18,6 +18,7 @@ create table marca(
     nome varchar(100) not null unique
 );
 
+-- Adicionar número, complemento e bairro
 create table endereco(
     id int primary key auto_increment,
     logradouro varchar(200) not null,
@@ -26,6 +27,7 @@ create table endereco(
     cep char(8) not null
 );
 
+-- Retirar o enum do status
 -- 3. Tabelas de Entidades (Pessoas e Empresas)
 create table funcionario(
     id int primary key auto_increment,
