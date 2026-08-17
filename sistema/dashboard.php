@@ -4,10 +4,10 @@ include 'includes/header.php';
 $cargo = $_SESSION['user_cargo'];
 ?>
 
-<main class="container">
+<main class="dashboard-container">
     <div class="header">
         <h1>👋 Olá, <?= $_SESSION['user_nome'] ?></h1>
-        <p>Painel de Controle - Papelaria Interna</p>
+        <p>Painel de Controle - Serviços Disponíveis</p>
     </div>
 
     <div class="grid-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 30px;">
@@ -36,6 +36,18 @@ $cargo = $_SESSION['user_cargo'];
             <p>Categorias, Marcas e Cargos</p>
         </div>
 
+        <div class="card" onclick="location.href='fornecedores_gestao.php'" style="cursor:pointer; background: #15929b; color: white; padding: 30px; border-radius: 10px; text-align: center;">
+            <div style="font-size: 40px; margin-bottom: 10px;">🚚</div>
+            <h3>Gestão de fornecedores</h3>
+            <p>Cadastragem de fornecedores</p>
+        </div>
+
+        <div class="card" onclick="location.href='cadastrar_produto.php'" style="cursor:pointer; background: #b8670a; color: white; padding: 30px; border-radius: 10px; text-align: center;">
+            <div style="font-size: 40px; margin-bottom: 10px;">✏️</div>
+            <h3>Cadastro de Produtos</h3>
+            <p>Adicionar novos produtos ao estoque</p>
+        </div>
+
 
         <?php if ($cargo == 'Gerente' || $cargo == 'Programador'): ?>
             
@@ -45,8 +57,8 @@ $cargo = $_SESSION['user_cargo'];
                 <p>Funcionários e Comissões</p>
             </div>
 
-            <div class="card" onclick="location.href='financeiro.php'" style="cursor:pointer; background: #7f8c8d; color: white; padding: 30px; border-radius: 10px; text-align: center;">
-                <div style="font-size: 40px; margin-bottom: 10px;">(D)</div>
+            <div class="card" onclick="location.href='financeiro.php'" style="cursor:pointer; background: #38b619; color: white; padding: 30px; border-radius: 10px; text-align: center;">
+                <div style="font-size: 40px; margin-bottom: 10px;">💵</div>
                 <h3>Faturamento da Empresa</h3>
                 <p>Vendas, Compras e saldo líquido</p>
             </div>

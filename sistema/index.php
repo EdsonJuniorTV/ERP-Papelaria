@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Papelaria Central</title>
+    <title>ERP-Papelaria</title>
     <link rel="stylesheet" href="public/css/css.css">
     <style>
         body { background: var(--bg); }
@@ -122,8 +122,8 @@
 <div class="login-page">
 
     <header class="hero">
-        <h1>✏️ Papelaria Central</h1>
-        <p>Sistema Interno de Gestão de Vendas e Estoque</p>
+        <h1>📙 ERP-Papelaria</h1>
+        <p>Sistema de Gestão de Vendas e Estoque</p>
     </header>
 
     <div class="login-body">
@@ -131,11 +131,15 @@
         <section class="noticias">
             <div class="card-noticia">
                 <h3>📢 Comunicado Interno</h3>
-                <p>O inventário geral será realizado no próximo sábado. Certifiquem-se de atualizar todas as entradas de nota fiscal até sexta-feira.</p>
+                <p>Desejamos que tudo de certo e que o seu dia seja maravilhoso!</p>
             </div>
             <div class="card-noticia">
-                <h3>🚀 Atualização de Segurança</h3>
-                <p>A partir de agora, o sistema utiliza sessões protegidas por cargo. Caso tenha problemas no acesso, procure o administrador.</p>
+                <h3>📢 Planos Futuros</h3>
+                <p>Futuramente as pastas serão reestruturadas.</p>
+            </div>
+            <div class="card-noticia">
+                <h3>📢 Aviso Importante</h3>
+                <p>O Sistema está sendo atualizado então é possível que haja erros que serão corrigidos em versões futuras.</p>
             </div>
         </section>
 

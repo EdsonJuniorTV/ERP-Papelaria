@@ -1,1 +1,3 @@
 Teste
+
+Sistema de ERP de uma papelaria. Ainda em fase de desenvolvimento.

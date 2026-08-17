@@ -30,7 +30,7 @@ $nome_usuario = $_SESSION['user_nome'] ?? 'Usuário';
     <header class="top-header">
         <div class="main-header">
             <div class="logo">
-                <h2><span>✏️</span> Papelaria Central</h2>
+                <h2><span>📙</span> ERP-Papelaria</h2>
             </div>
             <nav class="nav-menu">
                 <ul>
@@ -50,6 +50,8 @@ $nome_usuario = $_SESSION['user_nome'] ?? 'Usuário';
                     <li><a href="cadastro.php">👥 Clientes</a></li>
                     <li><a href="fornecedores_gestao.php">🚚 Fornecedores</a></li>
                     <li><a href="funcionarios_gestao.php">👔 RH</a></li>
+                    <li><a href="cadastrar_produto.php">✏️ Produtos</a></li>
+                    <li><a href="financeiro.php">💵 Financeiro</a></li>
                 </ul>
             </nav>
             <div class="user-info">
