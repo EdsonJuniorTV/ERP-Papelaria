@@ -1,5 +1,5 @@
 <?php
-
+// Fazer uma lógica para falar o id do funcionário atual que está logado no sistema
 require_once 'config/conexao.php';
 require_once 'includes/auth.php';
 include 'includes/header.php';

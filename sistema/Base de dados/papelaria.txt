@@ -217,18 +217,24 @@ begin
     end if;
 end; //
 
+-- Trigger: Histórico de alteração de produto (com captura do Funcionário)
 create trigger trg_log_preco_produto
 after update on produto
 for each row
 begin
+    -- Declara variável para armazenar o ID do funcionário logado
+    -- Se a aplicação não setar @id_funcionario, assume o ID 1 (Programador/Admin) como fallback
+    DECLARE v_id_func INT;
+    SET v_id_func = IFNULL(@id_funcionario, 1);
+
     if OLD.preco <> NEW.preco then
-        insert into historico_produto (id_prod, campo_alterado, valor_antigo, valor_novo)
-        values (OLD.id, 'preco', OLD.preco, NEW.preco);
+        insert into historico_produto (id_prod, id_func, campo_alterado, valor_antigo, valor_novo)
+        values (OLD.id, v_id_func, 'preco', OLD.preco, NEW.preco);
     end if;
     
     if OLD.nome <> NEW.nome then
-        insert into historico_produto (id_prod, campo_alterado, valor_antigo, valor_novo)
-        values (OLD.id, 'nome', OLD.nome, NEW.nome);
+        insert into historico_produto (id_prod, id_func, campo_alterado, valor_antigo, valor_novo)
+        values (OLD.id, v_id_func, 'nome', OLD.nome, NEW.nome);
     end if;
 end; //
 
