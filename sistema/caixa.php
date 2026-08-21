@@ -16,6 +16,7 @@
 <meta charset="UTF-8">
 <title>Caixa</title>
 <link rel="stylesheet" href="public/css/caixa.css">
+<link rel="stylesheet" href="public/css/css.css">
 </head>
 <body>
     <div class="wrap">
@@ -42,7 +43,7 @@
                                     <?php echo $p['qtd']; ?>
                                 </div>
                                 <div>
-                                    <button onclick="addCarrinho('<?php echo $p['id']; ?>','<?php echo $p['nome']; ?>',<?php echo $p['preco']; ?>,<?php echo $p['custo']; ?>)">+</button>
+                                    <button class="botaoAdd" onclick="addCarrinho('<?php echo $p['id']; ?>','<?php echo $p['nome']; ?>',<?php echo $p['preco']; ?>,<?php echo $p['custo']; ?>)">+</button>
                                 </div>
                             </div>
                         <?php } ?>
