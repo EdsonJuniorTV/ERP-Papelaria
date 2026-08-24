@@ -50,22 +50,32 @@ include 'includes/header.php';    // Traz o Menu e o CSS
 
                 <div class="form-group">
                     <label>Logradouro (Rua, Nº, Bairro)</label>
-                    <input type="text" name="logradouro" placeholder="Ex: Rua das Flores, 123 - Centro">
+                    <input type="text" name="logradouro" id="logradouro" placeholder="Ex: Rua das Flores, 123 - Jardim Centro" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>Rua</label>
+                    <input type="text" name="rua" id="rua" placeholder="Ex: Rua das moedas">
+                </div>
+                
+                <div class="form-group">
+                    <label>Número</label>
+                    <input type="text" name="numero" id="numero" placeholder="Ex: 2-10">
+                </div>
+
+                <div class="form-group">
+                    <label>Bairro</label>
+                    <input type="text" name="bairro" id="bairro" placeholder="Ex: Jardim Ferdinando">
                 </div>
 
                 <div class="form-group">
                     <label>Cidade</label>
-                    <input type="text" name="cidade" placeholder="Ex: Bauru">
+                    <input type="text" name="cidade" id="cidade" placeholder="Ex: Bauru">
                 </div>
 
                 <div class="form-group">
                     <label>Estado (UF)</label>
-                    <select name="estado">
-                        <option value="SP">São Paulo</option>
-                        <option value="RJ">Rio de Janeiro</option>
-                        <option value="MG">Minas Gerais</option>
-                        <option value="PR">Paraná</option>
-                    </select>
+                    <input type="text" name="estado" id="estado" placeholder="Ex: SP">
                 </div>
             </div>
 
