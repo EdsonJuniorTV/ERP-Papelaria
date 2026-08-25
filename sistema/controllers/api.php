@@ -77,6 +77,14 @@ try {
             $resposta = editarFuncionario($input, $conexao);
             break;
 
+        case 'REVIVE':
+            if (empty($input['id'])) {
+                $resposta = ["status" => false, "mensagem" => "ID do funcionário não informado."];
+                break;
+            }
+            $resposta = reativarFuncionario((int)$input['id'], $conexao);
+            break;
+
         case 'DELETE':
             if (empty($input['id'])) {
                 $resposta = ["status" => false, "mensagem" => "ID não informado para exclusão."];
@@ -95,6 +103,14 @@ try {
             } else {
                 $resposta = listarFuncionarios($conexao);
             }
+            break;
+
+        case 'REMOVE':
+            if (empty($input['id'])) {
+                $resposta = ["status" => false, "mensagem" => "ID não informado para exclusão."];
+                break;
+            }
+            $resposta = removerFuncionario((int)$input['id'], $conexao);
             break;
 
         default:

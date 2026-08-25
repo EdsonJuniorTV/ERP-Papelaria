@@ -69,7 +69,7 @@ $funcionarios = mysqli_fetch_all(
                                         <span style="background:#fde8e8; color:#9b1c1c; padding:3px 10px; border-radius:20px; font-size:.8rem; font-weight:600;">✖ Inativo</span>
                                     <?php endif; ?>
                                 </td>
-                                <td style="padding:13px 16px; display:flex; gap:8px; flex-wrap:wrap;">
+                                <td style="padding:13px 16px; display:flex; gap:4px; flex-wrap:wrap;">
                                     <button onclick='abrirEdicao(<?= json_encode($f) ?>)'
                                             style="background:#1a56db; color:#fff; border:none; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:.83rem; font-weight:600;">
                                         ✏️ Editar
@@ -77,9 +77,18 @@ $funcionarios = mysqli_fetch_all(
                                     <?php if ($f['status'] === 'Ativo'): ?>
                                         <button onclick="confirmarExclusao(<?= $f['id'] ?>, '<?= htmlspecialchars(addslashes($f['nome'])) ?>')"
                                                 style="background:#e02424; color:#fff; border:none; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:.83rem; font-weight:600;">
-                                            🗑 Desativar
+                                            🔒 Desativar
+                                        </button>
+                                    <?php else: ?>
+                                        <button onclick="reativarFuncionario(<?= $f['id'] ?>, '<?= htmlspecialchars(addslashes($f['nome'])) ?>')" 
+                                        style="background:#228B22; color:#fff; border:none; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:.83rem; font-weight:600;">
+                                            🔓 Reativar
                                         </button>
                                     <?php endif; ?>
+                                    <button onclick="removerFuncionario(<?= $f['id'] ?>, '<?= htmlspecialchars(addslashes($f['nome'])) ?>')"
+                                    style="background:#1C1C1C; color:#fff; border:none; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:.83rem; font-weight:600;">
+                                        🗑 Remover
+                                    </button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -90,7 +99,8 @@ $funcionarios = mysqli_fetch_all(
 
         <!-- ===== MODAL: Cadastro / Edição ===== -->
         <div id="modal-overlay" onclick="fecharModal()" 
-             style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:999; backdrop-filter:blur(2px);">
+             style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:999; 
+             backdrop-filter:blur(2px);">
         </div>
 
         <div id="modal-funcionario" 
@@ -161,13 +171,33 @@ $funcionarios = mysqli_fetch_all(
                     </div>
 
                     <div class="form-group form-group-full">
-                        <label>Endereço Residencial</label>
-                        <input type="text" name="logradouro" id="func_logradouro" placeholder="Rua, Número, Bairro">
+                        <label>CEP</label>
+                        <input type="text" name="cep" id="cep" placeholder="Ex: 00000-000">
                     </div>
-
-                    <input type="hidden" name="cidade" value="Bauru">
-                    <input type="hidden" name="estado" value="SP">
-                    <input type="hidden" name="cep" value="00000000">
+                    <div class="form-group">
+                        <label>Endereço Residencial</label>
+                        <input type="text" name="logradouro" id="logradouro" placeholder="Ex: Rua Salvador Dali, 1-40, Barmendes de Guimarães" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Rua</label>
+                        <input type="text" name="rua" id="rua" placeholder="Ex: Rua dos Barcos">
+                    </div>
+                    <div class="form-group">
+                        <label>Número</label>
+                        <input type="text" name="numero" id="numero" placeholder="Ex: 2-30">
+                    </div>
+                    <div class="form-group">
+                        <label>Bairro</label>
+                        <input type="text" name="bairro" id="bairro" placeholder="Ex: Sertão do Norte">
+                    </div>
+                    <div class="form-group">
+                        <label>Cidade</label>
+                        <input type="text" name="cidade" id="cidade" placeholder="Ex: São José do Rio Preto">
+                    </div>
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <input type="text" name="estado" id="estado" placeholder="Ex: MG">
+                    </div>
                 </div>
 
                 <div style="margin-top:24px; display:flex; gap:12px; justify-content:flex-end;">
@@ -241,6 +271,38 @@ function confirmarExclusao(id, nome) {
         if (res.status) location.reload();
     })
     .catch(() => alert('Erro de comunicação com o servidor.'));
+}
+
+function reativarFuncionario(id, nome) {
+    if (!confirm(`Ativar o funcionário "${nome}"?\n\nEle será reativado.`)) return;
+
+    fetch('/ERP-Papelaria/sistema/controllers/api.php', {
+        method: 'REVIVE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id })
+    })
+    .then(r => r.json())
+    .then(res => {
+        alert(res.mensagem);
+        if (res.status) location.reload();
+    })
+    .catch(() => alert('Erro de comunicação com o servidor.'));
+}
+
+function removerFuncionario(id, nome) {
+    if (!confirm(`Deletar o Funcionário "${nome}"?\n\nEle será apagado definitivamente.`)) return;
+
+        fetch('/ERP-Papelaria/sistema/controllers/api.php', {
+            method: 'REMOVE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: id })
+        })
+        .then(r => r.json())
+        .then(res => {
+            alert(res.mensagem);
+            if (res.status) location.reload();
+        })
+        .catch(() => alert('Erro de comunicação com o servidor.'));
 }
 
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fecharModal(); });

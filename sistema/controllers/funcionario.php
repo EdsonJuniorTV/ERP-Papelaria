@@ -81,3 +81,53 @@ function excluirFuncionario($id, $conn) {
         return ["status" => false, "mensagem" => "Erro ao excluir: " . $e->getMessage()];
     }
 }
+
+function reativarFuncionario($id, $conn) {
+    try {
+        $sql = "UPDATE funcionario SET status = 'Ativo' WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $id);
+
+        if ($stmt->execute()) {
+            return ["status" => true, "mensagem" => "Funcionário Reativado com sucesso!"];
+        }
+        throw new Exception($stmt->error);
+    } catch (Exception $e) {
+        return ["status" => false, "mensagem" => "Erro ao reativar: " . $e->getMessage()];
+    }
+}
+
+function removerFuncionario($id, $conn) {
+    try {
+        // Começa a transação
+        $conn->begin_transaction();
+
+        // Apaga o histórico do funcionário
+        $primeiroSQL = "DELETE from historico_funcionario WHERE id_func = ?";
+        $stmtHist = $conn->prepare($primeiroSQL);
+        $stmtHist->bind_param("i", $id);
+
+        if (!$stmtHist->execute()) {
+            throw new Exception("Erro ao apagar o histórico: " . $stmtHist->error);
+        }
+        $stmtHist->close(); // Libera o recurso
+
+        // Apaga o funcionário
+        $sql = "DELETE from funcionario WHERE id = ?";
+        $stmtFunc = $conn->prepare($sql);
+        $stmtFunc->bind_param("i", $id);
+
+        if (!$stmtFunc->execute()) {
+            throw new Exception("Erro ao apagar o funcionário: " . $stmtFunc->error);
+        }
+        $stmtFunc->close(); // Libera o recurso
+
+        $conn->commit(); // Se tudo deu certo, confirma no banco
+
+        return ["status" => true, "mensagem" => "Funcionário Removido com sucesso!"];
+
+    } catch (Exception $e) {
+        $conn->rollback(); // Se qualquer coisa der erro, desfaz as alterações
+        return ["status" => false, "mensagem" => "Erro ao remover: " . $e->getMessage()];
+    }
+}
