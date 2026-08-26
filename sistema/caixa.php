@@ -2,8 +2,40 @@
     require_once 'config/conexao.php';
     include 'includes/header.php';
 
-    $produtos = mysqli_query($conexao, "SELECT p.id, p.nome, p.preco, p.custo, e.qtd FROM produto p JOIN estoque e ON p.id = e.id_prod WHERE e.qtd > 0");
+    $filtroNome = isset($_GET['nome']) ? trim($_GET['nome']) : '';
+    $filtroFornecedor = isset($_GET['fornecedor']) ? intval($_GET['fornecedor']) : 0;
+    $filtroMarca = isset($_GET['marca']) ? intval($_GET['marca']) : 0;
+
     $clientes = mysqli_query($conexao, "SELECT id, nome FROM cliente");
+
+    $fornecedores = mysqli_fetch_all(mysqli_query($conexao, "SELECT id, nome FROM fornecedor ORDER BY nome ASC"), MYSQLI_ASSOC);
+    $marcas = mysqli_fetch_all(mysqli_query($conexao, "SELECT id, nome FROM marca ORDER BY nome ASC"), MYSQLI_ASSOC);
+    $categorias = mysqli_fetch_all(mysqli_query($conexao, "SELECT id, nome FROM categoria ORDER BY nome ASC"), MYSQLI_ASSOC);
+
+    $sql = "SELECT 
+        p.id, p.nome, p.preco, p.id_cat, 
+        p.custo, p.id_forn, p.id_marca,
+        c.nome AS categoria,
+        f.nome AS fornecedor,
+        m.nome AS marca,
+        e.qtd FROM produto p 
+        JOIN estoque e ON p.id = e.id_prod
+        JOIN categoria c ON p.id_cat = c.id
+        JOIN fornecedor f ON p.id_forn = f.id
+        JOIN marca m ON p.id_marca = m.id
+        WHERE 1 = 1 AND e.qtd > 0";
+
+    if ($filtroNome !== '') {
+        $sql .= " AND p.nome LIKE '%" . mysqli_real_escape_string($conexao, $filtroNome) . "%'";
+    }
+    if ($filtroFornecedor > 0) {
+        $sql .= " AND p.id_forn = $filtroFornecedor";
+    }
+    if ($filtroMarca > 0) {
+        $sql .= " AND p.id_marca = $filtroMarca";
+    }
+
+    $produtos = mysqli_query($conexao, $sql);
 
     $custo_total = mysqli_fetch_assoc(
     mysqli_query($conexao,"SELECT SUM(p.custo * e.qtd) as total FROM produto p JOIN estoque e ON p.id = e.id_prod WHERE e.qtd > 0")
@@ -27,10 +59,42 @@
             <div class="card">
                 <h2>Produtos</h2>
 
+                <form method="GET">
+                    <label>Buscar Pelo Nome do Produto</label>
+                    <input type="text" name="nome" placeholder="Ex: Nome do produto."
+                    value="<?= htmlspecialchars($filtroNome)?>">
+
+                    <select name="fornecedor">
+                        <option value="0">Todas os Fornecedores</option>
+                        <?php foreach($fornecedores as $f): ?>
+                            <option value="<?= $f['id']?>" <?= ($filtroFornecedor == $f['id']) ? 'selected' : '' ?>>
+                                <?= $f['nome']?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+
+                    <select name="marca">
+                        <option value="0">Todas as Marcas</option>
+                        <?php foreach($marcas as $m): ?>
+                            <option value="<?= $m['id']?>" <?= ($filtroMarca == $m['id']) ? 'selected' : '' ?>>
+                                <?= $m['nome']?>
+                            </option>
+                        <?php endforeach;?>
+                    </select>
+
+                    <button type="submit">
+                        Filtrar
+                    </button>
+                </form>
+
                 <div class="table">
                     <div class="thead">
-                        <div>Código</div><div>Produto</div><div>Preço</div><div>Estoque</div>
-                        <div></div>
+                        <div>Código</div>
+                        <div>Produto</div>
+                        <div>Marca</div>
+                        <div>Fornecedor</div>
+                        <div>Preço</div>
+                        <div>Estoque</div>
                     </div>
 
                     <div class="tbody">
@@ -38,12 +102,25 @@
                             <div class="tr">
                                 <div><?php echo $p['id']; ?></div>
                                 <div><?php echo $p['nome']; ?></div>
+                                <div><?php echo $p['marca']; ?></div>
+                                <div><?php echo $p['fornecedor']; ?></div>
                                 <div><?php echo number_format($p['preco'],2,',','.'); ?></div>
                                 <div id="est_<?php echo $p['id']; ?>">
                                     <?php echo $p['qtd']; ?>
                                 </div>
                                 <div>
-                                    <button class="botaoAdd" onclick="addCarrinho('<?php echo $p['id']; ?>','<?php echo $p['nome']; ?>',<?php echo $p['preco']; ?>,<?php echo $p['custo']; ?>)">+</button>
+                                    <button class="botaoAdd" 
+                                    onclick="addCarrinho(
+                                    '<?php echo $p['id']; ?>',
+                                    '<?php echo $p['nome']; ?>',
+                                    <?php echo $p['preco']; ?>,
+                                    <?php echo $p['custo']; ?>)">
+                                        +
+                                    </button>
+                                    <button class="botaoAdd"
+                                    onclick="removerCarrinho('<?php echo $p['id']; ?>')">
+                                        -
+                                    </button>
                                 </div>
                             </div>
                         <?php } ?>
@@ -169,6 +246,26 @@
             let i = carrinho.find(x=>x.cod==c);
 
             if(i)i.qtd++; else carrinho.push({cod:c,nome:n,preco:p,custo:ct,qtd:1});
+
+            atualizar();
+        }
+
+        function removerCarrinho(c){
+
+            let i=carrinho.find(x=>x.cod==c);
+
+            if(!i || i.qtd<=0){
+                alert('Este produto não está no carrinho');
+                return;
+            }
+
+            let est=document.getElementById('est_'+c);
+            est.innerText=parseInt(est.innerText)+1;
+            i.qtd--;
+            
+            if(i.qtd===0){
+                carrinho=carrinho.filter(x=>x.cod!=c);
+            }
 
             atualizar();
         }

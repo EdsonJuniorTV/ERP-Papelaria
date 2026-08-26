@@ -1,5 +1,5 @@
 :root{ 
-  --bg:#ffffff; --card:#ffffff; --muted:#535353; --text:#000000;
+  --bg:#0f172a; --card:#0b1223; --muted:#94a3b8; --text:#e5e7eb;
   --line:#1f2a44; --btn:#2563eb; --ok:#16a34a; --err:#ef4444;
 }
 
@@ -7,7 +7,7 @@
 
 body{
   margin:0;
-  background:linear-gradient(120deg,#ffffff, #ffffff);
+  background:linear-gradient(120deg,#0b1020, #0f172a);
   color:var(--text);
 }
 
@@ -22,12 +22,13 @@ h1{ margin:0 0 15px; }
 }
 
 .card{
-  background:rgba(243, 243, 243, 0.9);
+  background:rgba(11,18,35,0.9);
+  border:1px solid var(--line);
   border-radius:14px;
   padding:14px;
 }
 
-.row{ 
+.row{
   display:flex;
   gap:10px;
   align-items:center;
@@ -37,27 +38,27 @@ h1{ margin:0 0 15px; }
 input, select{
   width:100%;
   padding:10px;
-  border-radius:10px; 
-  border:none;
-  background:#e7e7e7;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:#0a1020;
   color:var(--text);
 }
 
 .table{
+  border:1px solid var(--line);
   border-radius:12px;
   overflow:hidden;
 }
 
 .thead, .tr{
   display:grid;
-  background-color: rgb(250, 250, 250);
   grid-template-columns: 0.7fr 2.2fr 1fr 1fr 0.6fr;
   gap:10px;
   padding:10px;
 }
 
 .thead{
-  background:#e7e7e7;
+  background:#081022;
   color:var(--muted);
 }
 
@@ -106,7 +107,7 @@ input, select{
   border-radius:10px;
   color:#86efac;
   font-size:14px;
-  background:#ffffff;
+  background:#081022;
 }
 
 #comanda{
@@ -145,9 +146,10 @@ input, select{
 }
 
 #resumo-comanda{
-  background:#e7e7e7;
+  background:#081022;
   padding:15px;
   border-radius:12px;
+  border:1px solid var(--line);
   line-height:1.8;
 }
 
@@ -167,7 +169,7 @@ input, select{
   margin:10px 0 15px 0;
   padding:12px;
   border-radius:10px;
-  background:#ffffff;
+  background:#081022;
   border:1px solid var(--line);
   color:#86efac;
   font-weight:600;
@@ -182,8 +184,8 @@ input, select{
   margin-top:15px;
   padding:10px;
   border-radius:10px;
-  background:#e7e7e7;
-
+  background:#081022;
+  border:1px solid var(--line);
 }
 
 #tela2 button{
@@ -205,21 +207,4 @@ input, select{
   .grid{
     grid-template-columns:1fr;
   }
-}
-
-.botaoAdd{
-  display: flex;
-  outline: none;
-  background: #3498db;
-  color:white;
-  border:none;
-  padding:5px 10px;
-  cursor:pointer;
-  border-radius: 10px;
-  align-items: center;
-  align-content: center;
-  font-size: .85rem;
-  font-family: var(--font-sans);
-  transition: border-color .15s;
-  box-shadow: 0 0 0 3px rgba(26,86,219,.1);
 }
