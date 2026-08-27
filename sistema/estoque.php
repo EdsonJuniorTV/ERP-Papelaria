@@ -150,209 +150,786 @@ FROM produto p
 JOIN estoque e ON p.id = e.id_prod
 WHERE 1=1";
 
-$total = mysqli_fetch_assoc(mysqli_query($conexao,$sqlTotal))['total'];
+if ($search !== '') {
+    $sqlTotal .= " AND p.nome LIKE '%".mysqli_real_escape_string($conexao, $search)."%'";
+}
+
+if ($filtro_fornecedor > 0) {
+    $sqlTotal .= " AND p.id_forn = $filtro_fornecedor";
+}
+
+if ($filtro_marca > 0) {
+    $sqlTotal .= " AND p.id_marca = $filtro_marca";
+}
+
+$resultTotal = mysqli_query($conexao, $sqlTotal);
+$total = mysqli_fetch_assoc($resultTotal)['total'];
+
 $total_pages = ceil($total / $limit);
+
 
 ?>
 
+<style>
+.estoque-acoes {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.estoque-acoes .btn-submit {
+    white-space: nowrap;
+}
+
+.filtros-estoque {
+    display: grid;
+    grid-template-columns: minmax(220px, 2fr) minmax(180px, 1fr) minmax(180px, 1fr) auto;
+    gap: 14px;
+    align-items: end;
+    padding: 22px 28px !important;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+}
+
+.filtros-estoque .form-group {
+    padding: 0;
+}
+
+.filtro-botao {
+    display: flex;
+    align-items: flex-end;
+}
+
+.filtro-botao .btn-submit {
+    height: 40px;
+}
+
+.estoque-modal {
+    display: none;
+    margin: 20px 28px;
+    padding: 24px !important;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+}
+
+.estoque-modal h3 {
+    margin-bottom: 4px;
+}
+
+.modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 22px;
+}
+
+.modal-header h3 {
+    font-size: 1.05rem;
+}
+
+.modal-header p {
+    margin-top: 4px;
+    font-size: .82rem;
+}
+
+.modal-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-muted);
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: none;
+}
+
+.modal-close:hover {
+    background: var(--red-light);
+    border-color: var(--red);
+    color: var(--red);
+}
+
+.produto-form {
+    padding: 0;
+}
+
+.form-acoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 22px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+#modal-entrada {
+    margin: 20px 28px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+}
+
+#modal-entrada .modal-header {
+    margin-bottom: 18px;
+}
+
+#form-entrada-estoque {
+    display: grid;
+    grid-template-columns: minmax(250px, 1fr) 160px auto;
+    gap: 14px;
+    align-items: end;
+}
+
+#form-entrada-estoque .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+#form-entrada-estoque select,
+#form-entrada-estoque input[type="number"] {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    font-family: var(--font-sans);
+    font-size: .9rem;
+    color: var(--text);
+    background: var(--surface);
+}
+
+#form-entrada-estoque select:focus,
+#form-entrada-estoque input[type="number"]:focus {
+    outline: none;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(26, 86, 219, .12);
+}
+
+.tabela-estoque {
+    margin-top: 20px;
+}
+
+.tabela-topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 28px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+.tabela-topo h2 {
+    font-size: 1rem;
+}
+
+.tabela-topo p {
+    margin-top: 3px;
+    font-size: .82rem;
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.tabela-estoque table {
+    min-width: 950px;
+}
+
+.tabela-estoque tbody td {
+    padding: 14px 16px;
+}
+
+.tabela-estoque tbody td strong {
+    font-weight: 600;
+}
+
+.acoes-tabela {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-acao {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 9px;
+    border-radius: 7px;
+    border: 1px solid transparent;
+    font-family: var(--font-sans);
+    font-size: .78rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background .15s, color .15s, border-color .15s;
+}
+
+.btn-editar {
+    background: var(--brand-light);
+    color: var(--brand);
+    border-color: #c7d8fb;
+}
+
+.btn-editar:hover {
+    background: var(--brand);
+    color: #fff;
+    text-decoration: none;
+}
+
+.btn-excluir {
+    background: var(--red-light);
+    color: var(--red);
+    border-color: #f5c2c2;
+}
+
+.btn-excluir:hover {
+    background: var(--red);
+    color: #fff;
+    text-decoration: none;
+}
+
+
+.paginacao {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 24px 28px 28px;
+}
+
+.paginacao a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-size: .82rem;
+    font-weight: 600;
+    transition: background .15s, color .15s, border-color .15s;
+}
+
+.paginacao a:hover {
+    background: var(--brand-light);
+    color: var(--brand);
+    border-color: #bfd2fa;
+    text-decoration: none;
+}
+
+.paginacao a.active {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #fff;
+}
+
+
+/* Destaque de estoque baixo */
+
+.tabela-estoque tbody tr:has(.badge-danger) {
+    background: rgba(224, 36, 36, .025);
+}
+
+.tabela-estoque tbody tr:has(.badge-danger):hover {
+    background: var(--red-light);
+}
+
+</style>
 <main>
 
-<div class="container" style="max-width:95%;">
+<div class="container" style="max-width: 1400px;">
 
-<div style="background:#2d3748; padding:15px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-    <h1 style="color:white;">📦 Controle de Estoque</h1>
+    <div class="header">
+        <div class="flex items-center justify-between" style="gap:20px; flex-wrap:wrap;">
+            <div>
+                <h1>📦 Controle de Estoque</h1>
+                <p>Gerencie produtos, entradas e níveis de estoque.</p>
+            </div>
 
-    <div style="display:flex; gap:10px;">
-        <button onclick="toggleModal('modal-cadastro')"
-                style="background:#3182ce; color:white; padding:10px 20px; border:none; border-radius:5px;">
-            + Nova Mercadoria
-        </button>
+            <div class="estoque-acoes">
+                <button type="button"
+                        class="btn-submit"
+                        onclick="toggleModal('modal-cadastro')">
+                    + Nova Mercadoria
+                </button>
 
-        <button onclick="toggleModal('modal-entrada')"
-                style="background:#48bb78; color:white; padding:10px 20px; border:none; border-radius:5px;">
-            + Entrada de Mercadoria
-        </button>
+                <button type="button"
+                        class="btn-submit btn-success"
+                        onclick="toggleModal('modal-entrada')">
+                    + Entrada de Mercadoria
+                </button>
+            </div>
+        </div>
     </div>
-</div>
 
-<form method="GET" style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
+    <form method="GET" class="filtros-estoque">
 
-    <input type="text" name="search" placeholder="Buscar produto..."
-           value="<?=htmlspecialchars($search)?>" style="padding:8px;">
+        <div class="form-group filtro-busca">
+            <label for="search">Produto</label>
+            <input
+                type="text"
+                id="search"
+                name="search"
+                placeholder="Buscar produto..."
+                value="<?=htmlspecialchars($search)?>"
+            >
+        </div>
 
-    <select name="fornecedor" style="padding:8px;">
-        <option value="0">Todos fornecedores</option>
-        <?php foreach($fornecedores as $f): ?>
-            <option value="<?=$f['id']?>" <?=($filtro_fornecedor==$f['id'])?'selected':''?>>
-                <?=$f['nome']?>
-            </option>
-        <?php endforeach; ?>
-    </select>
+        <div class="form-group">
+            <label for="fornecedor">Fornecedor</label>
 
-    <select name="marca" style="padding:8px;">
-        <option value="0">Todas marcas</option>
-        <?php foreach($marcas as $m): ?>
-            <option value="<?=$m['id']?>" <?=($filtro_marca==$m['id'])?'selected':''?>>
-                <?=$m['nome']?>
-            </option>
-        <?php endforeach; ?>
-    </select>
+            <select name="fornecedor" id="fornecedor">
+                <option value="0">Todos fornecedores</option>
 
-    <button type="submit" style="padding:8px 15px; background:#2b6cb0; color:#fff; border:none; border-radius:5px;">
-        Filtrar
-    </button>
+                <?php foreach($fornecedores as $f): ?>
+                    <option
+                        value="<?=$f['id']?>"
+                        <?=($filtro_fornecedor == $f['id']) ? 'selected' : ''?>
+                    >
+                        <?=htmlspecialchars($f['nome'])?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
 
-</form>
+        <div class="form-group">
+            <label for="marca">Marca</label>
 
-<div id="modal-cadastro" style="display:none; background:#fff; padding:20px; margin-top:20px; border-radius:8px;">
+            <select name="marca" id="marca">
+                <option value="0">Todas marcas</option>
 
-<h3>Novo / Editar Produto</h3>
+                <?php foreach($marcas as $m): ?>
+                    <option
+                        value="<?=$m['id']?>"
+                        <?=($filtro_marca == $m['id']) ? 'selected' : ''?>
+                    >
+                        <?=htmlspecialchars($m['nome'])?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
 
-<form method="POST">
+        <div class="filtro-botao">
+            <button type="submit" class="btn-submit">
+                🔎 Filtrar
+            </button>
+        </div>
 
-    <input type="hidden" name="id_produto" id="id_produto">
+    </form>
 
-    <input type="text" name="nome" placeholder="Nome do produto" required>
 
-    <select name="categoria" required>
-        <?php foreach($categorias as $c): ?>
-            <option value="<?=$c['id']?>"><?=$c['nome']?></option>
-        <?php endforeach; ?>
-    </select>
+    <div id="modal-cadastro" class="estoque-modal">
 
-    <select name="fornecedor" required>
-        <?php foreach($fornecedores as $f): ?>
-            <option value="<?=$f['id']?>"><?=$f['nome']?></option>
-        <?php endforeach; ?>
-    </select>
+        <div class="modal-header">
+            <div>
+                <h3>Nova / Editar Produto</h3>
+                <p>Cadastre ou altere as informações da mercadoria.</p>
+            </div>
 
-    <select name="marca" required>
-        <?php foreach($marcas as $m): ?>
-            <option value="<?=$m['id']?>"><?=$m['nome']?></option>
-        <?php endforeach; ?>
-    </select>
+            <button
+                type="button"
+                class="modal-close"
+                onclick="toggleModal('modal-cadastro')">
+                ×
+            </button>
+        </div>
 
-    <input type="number" step="0.01" name="preco" placeholder="Preço" required>
-    <input type="number" step="0.01" name="custo" placeholder="Custo" required>
-    <input type="number" name="qtd" placeholder="Quantidade inicial" required>
-    <input type="number" name="qtd_minima" placeholder="Quantidade mínima" required>
+        <form method="POST" class="produto-form">
 
-    <button type="submit" name="cadastrar_produto">Salvar</button>
+            <input
+                type="hidden"
+                name="id_produto"
+                id="id_produto"
+            >
 
-</form>
-</div>
+            <div class="form-grid">
 
-<div id="modal-entrada" style="display:none; background:#fff; padding:20px; margin-top:20px; border-radius:8px;">
+                <div class="form-group form-group-full">
+                    <label for="nome">
+                        Nome do produto <span>*</span>
+                    </label>
 
-<h3>Entrada de Mercadoria</h3>
+                    <input
+                        type="text"
+                        name="nome"
+                        id="nome"
+                        placeholder="Nome do produto"
+                        required
+                    >
+                </div>
 
-<form method="POST">
+                <div class="form-group">
+                    <label for="categoria">
+                        Categoria <span>*</span>
+                    </label>
 
-    <select name="produto" required>
-        <?php foreach($lista_produtos as $p): ?>
-            <option value="<?=$p['id']?>"><?=$p['nome']?></option>
-        <?php endforeach; ?>
-    </select>
+                    <select name="categoria" id="categoria" required>
+                        <?php foreach($categorias as $c): ?>
+                            <option value="<?=$c['id']?>">
+                                <?=htmlspecialchars($c['nome'])?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
 
-    <input type="number" name="qtd_entrada" placeholder="Quantidade" required>
+                <div class="form-group">
+                    <label for="fornecedor-produto">
+                        Fornecedor <span>*</span>
+                    </label>
 
-    <button type="submit" name="entrada_mercadoria">Registrar Entrada</button>
+                    <select
+                        name="fornecedor"
+                        id="fornecedor-produto"
+                        required
+                    >
+                        <?php foreach($fornecedores as $f): ?>
+                            <option value="<?=$f['id']?>">
+                                <?=htmlspecialchars($f['nome'])?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
 
-</form>
+                <div class="form-group">
+                    <label for="marca-produto">
+                        Marca <span>*</span>
+                    </label>
 
-</div>
+                    <select
+                        name="marca"
+                        id="marca-produto"
+                        required
+                    >
+                        <?php foreach($marcas as $m): ?>
+                            <option value="<?=$m['id']?>">
+                                <?=htmlspecialchars($m['nome'])?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
 
-<table style="width:100%; margin-top:20px; background:#fff; border-collapse:collapse;">
+                <div class="form-group">
+                    <label for="preco">
+                        Preço <span>*</span>
+                    </label>
 
-<thead>
-<tr style="background:#EDF2F7;">
-    <th>Produto</th>
-    <th>Categoria</th>
-    <th>Fornecedor</th>
-    <th>Marca</th>
-    <th>Qtd Atual</th>
-    <th>Qtd Mínima</th>
-    <th>Status</th>
-    <th>Ações</th>
-</tr>
-</thead>
+                    <input
+                        type="number"
+                        step="0.01"
+                        name="preco"
+                        id="preco"
+                        placeholder="0,00"
+                        required
+                    >
+                </div>
 
-<tbody>
+                <div class="form-group">
+                    <label for="custo">
+                        Custo <span>*</span>
+                    </label>
 
-<?php while($i = mysqli_fetch_assoc($res)): ?>
+                    <input
+                        type="number"
+                        step="0.01"
+                        name="custo"
+                        id="custo"
+                        placeholder="0,00"
+                        required
+                    >
+                </div>
 
-<tr>
+                <div class="form-group">
+                    <label for="qtd">
+                        Quantidade inicial <span>*</span>
+                    </label>
 
-    <td><?=$i['nome']?></td>
-    <td><?=$i['categoria']?></td>
-    <td><?=$i['fornecedor']?></td>
-    <td><?=$i['marca']?></td>
+                    <input
+                        type="number"
+                        name="qtd"
+                        id="qtd"
+                        placeholder="0"
+                        required
+                    >
+                </div>
 
-    <td style="color:<?=($i['qtd'] <= $i['qtd_minima']) ? 'red' : 'black'?>">
-        <?=$i['qtd']?>
-    </td>
+                <div class="form-group">
+                    <label for="qtd_minima">
+                        Quantidade mínima <span>*</span>
+                    </label>
 
-    <td><?=$i['qtd_minima']?></td>
+                    <input
+                        type="number"
+                        name="qtd_minima"
+                        id="qtd_minima"
+                        placeholder="0"
+                        required
+                    >
+                </div>
+            </div>
 
-    <td>
-        <?=($i['qtd'] <= $i['qtd_minima']) ? 'Reposição Necessária' : 'Estoque OK'?>
-    </td>
+            <div class="form-acoes">
+                <button
+                    type="button"
+                    class="btn-submit btn-ghost"
+                    onclick="toggleModal('modal-cadastro')">
+                    Cancelar
+                </button>
 
-    <td>
-        <a href="?delete=<?=$i['id']?>" onclick="return confirm('Excluir?')" style="color:red;">Excluir</a>
-        |
-        <a href="javascript:void(0)" onclick='editarProduto(<?=json_encode($i)?>)' style="color:blue;">Editar</a>
-    </td>
+                <button
+                    type="submit"
+                    name="cadastrar_produto"
+                    class="btn-submit">
+                    💾 Salvar Produto
+                </button>
+            </div>
 
-</tr>
+        </form>
+    </div>
 
-<?php endwhile; ?>
+    <div id="modal-entrada">
 
-</tbody>
-</table>
+        <div class="modal-header">
+            <div>
+                <h3>📥 Entrada de Mercadoria</h3>
+                <p>Registre a entrada de produtos no estoque.</p>
+            </div>
 
-<div style="margin-top:20px; display:flex; gap:5px; flex-wrap:wrap;">
+            <button
+                type="button"
+                class="modal-close"
+                onclick="toggleModal('modal-entrada')">
+                ×
+            </button>
+        </div>
 
-<?php for($i=1; $i <= $total_pages; $i++): ?>
+        <form
+            method="POST"
+            id="form-entrada-estoque"
+        >
 
-<a href="?page=<?=$i?>"
-   style="padding:5px 10px; border:1px solid #ccc;
-   background:<?=($i==$page)?'#3182ce':'#fff'?>;
-   color:<?=($i==$page)?'#fff':'#000'?>;
-   text-decoration:none;">
-   <?=$i?>
-</a>
+            <div class="form-group">
+                <label for="produto-entrada">
+                    Produto <span>*</span>
+                </label>
+
+                <select
+                    name="produto"
+                    id="produto-entrada"
+                    required
+                >
+                    <?php foreach($lista_produtos as $p): ?>
+                        <option value="<?=$p['id']?>">
+                            <?=htmlspecialchars($p['nome'])?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="qtd-entrada">
+                    Quantidade <span>*</span>
+                </label>
+
+                <input
+                    type="number"
+                    name="qtd_entrada"
+                    id="qtd-entrada"
+                    placeholder="Quantidade"
+                    min="1"
+                    required
+                >
+            </div>
+
+            <button
+                type="submit"
+                name="entrada_mercadoria"
+                class="btn-submit btn-success">
+                📥 Registrar Entrada
+            </button>
+
+        </form>
+
+    </div>
+
+    <div class="tabela-estoque">
+
+        <div class="tabela-topo">
+            <div>
+                <h2>Produtos em Estoque</h2>
+                <p>Visualize a situação atual das mercadorias.</p>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Categoria</th>
+                        <th>Fornecedor</th>
+                        <th>Marca</th>
+                        <th>Qtd. Atual</th>
+                        <th>Qtd. Mínima</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                <?php while($i = mysqli_fetch_assoc($res)): ?>
+
+                    <?php
+                        $estoque_baixo = ($i['qtd'] <= $i['qtd_minima']);
+                    ?>
+
+                    <tr>
+
+                        <td>
+                            <strong><?=htmlspecialchars($i['nome'])?></strong>
+                        </td>
+
+                        <td>
+                            <?=htmlspecialchars($i['categoria'])?>
+                        </td>
+
+                        <td>
+                            <?=htmlspecialchars($i['fornecedor'])?>
+                        </td>
+
+                        <td>
+                            <?=htmlspecialchars($i['marca'])?>
+                        </td>
+
+                        <td>
+                            <span class="<?= $estoque_baixo ? 'text-red' : 'text-green' ?>">
+                                <?=$i['qtd']?>
+                            </span>
+                        </td>
+
+                        <td>
+                            <?=$i['qtd_minima']?>
+                        </td>
+
+                        <td>
+
+                            <?php if($estoque_baixo): ?>
+
+                                <span class="badge badge-danger">
+                                    ⚠ Reposição Necessária
+                                </span>
+
+                            <?php else: ?>
+
+                                <span class="badge badge-ok">
+                                    ✓ Estoque OK
+                                </span>
+
+                            <?php endif; ?>
+
+                        </td>
+
+                        <td>
+
+                            <div class="acoes-tabela">
+
+                                <button
+                                    type="button"
+                                    class="btn-acao btn-editar"
+                                    onclick='editarProduto(<?=json_encode($i, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT)?>)'
+                                    title="Editar produto">
+                                    ✏ Editar
+                                </button>
+
+                                <a
+                                    href="?delete=<?=$i['id']?>"
+                                    class="btn-acao btn-excluir"
+                                    onclick="return confirm('Deseja realmente excluir este produto?')"
+                                    title="Excluir produto">
+                                    🗑 Excluir
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+
+                <?php endwhile; ?>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    
+    <?php if($total_pages > 1): ?>
+        <div class="paginacao">
+            <?php for($i = 1; $i <= $total_pages; $i++): ?>
+    <a
+        href="?<?=http_build_query([
+            'page' => $i,
+            'search' => $search,
+            'fornecedor' => $filtro_fornecedor,
+            'marca' => $filtro_marca
+        ])?>"
+        class="<?=($i == $page) ? 'active' : ''?>">
+        <?=$i?>
+    </a>
 
 <?php endfor; ?>
-
-</div>
-
+        </div>
+    <?php endif; ?>
 </div>
 </main>
-
 <script>
-function toggleModal(id){
+
+function toggleModal(id) {
+
     const modal = document.getElementById(id);
-    const visible = window.getComputedStyle(modal).display !== "none";
-    modal.style.display = visible ? "none" : "block";
+
+    if (!modal) {
+        return;
+    }
+
+    const visible = window.getComputedStyle(modal).display !== 'none';
+
+    modal.style.display = visible ? 'none' : 'block';
 }
 
-function editarProduto(p){
 
-    document.getElementById('modal-cadastro').style.display = 'block';
+function editarProduto(p) {
 
+    const modal = document.getElementById('modal-cadastro');
+    modal.style.display = 'block';
     document.getElementById('id_produto').value = p.id;
-    document.querySelector('[name="nome"]').value = p.nome;
-    document.querySelector('[name="preco"]').value = p.preco;
-    document.querySelector('[name="custo"]').value = p.custo;
-    
-    document.querySelector('[name="qtd"]').value = p.qtd;
-    document.querySelector('[name="qtd_minima"]').value = p.qtd_minima;
+    document.getElementById('nome').value = p.nome || '';
+    document.getElementById('preco').value = p.preco || '';
+    document.getElementById('custo').value = p.custo || '';
+    document.getElementById('qtd').value = p.qtd || '';
+    document.getElementById('qtd_minima').value = p.qtd_minima || '';
+    document.getElementById('categoria').value = p.id_cat || '';
+    document.getElementById('fornecedor-produto').value = p.id_forn || '';
+    document.getElementById('marca-produto').value = p.id_marca || '';
 
-    document.querySelector('[name="categoria"]').value = p.id_cat;
-    document.querySelector('[name="fornecedor"]').value = p.id_forn;
-    document.querySelector('[name="marca"]').value = p.id_marca;
+    modal.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+    });
 }
+
 </script>
 
 <?php include 'includes/footer.php'; ?>
