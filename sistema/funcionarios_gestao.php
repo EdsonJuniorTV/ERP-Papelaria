@@ -1,8 +1,19 @@
 <?php 
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    if(!isset($_SESSION['user_id'])) {
+        header("Location: index.php?erro=2");
+        exit;
+    }
+
 require_once 'includes/auth.php';
 require_once 'config/conexao.php';
 verificarPermissao(['Gerente', 'Programador']);
 include 'includes/header.php';
+
+$usuarioLogadoId = (int) $_SESSION['user_id'];
 
 $cargos = mysqli_query($conexao, "SELECT * FROM cargo ORDER BY nome ASC");
 
@@ -12,6 +23,7 @@ $funcionarios = mysqli_fetch_all(
                c.nome AS cargo, f.id_cargo
         FROM funcionario f
         JOIN cargo c ON f.id_cargo = c.id
+        WHERE f.id <> $usuarioLogadoId
         ORDER BY f.nome ASC
     "),
     MYSQLI_ASSOC

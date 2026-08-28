@@ -2,12 +2,18 @@
 // Fazer uma lógica para falar o id do funcionário atual que está logado no sistema
 require_once 'config/conexao.php';
 require_once 'includes/auth.php';
+
+// ATENÇÃO: Certifique-se de que a sessão já foi iniciada no auth.php
+// Substitua 'id_funcionario' pelo nome da variável de sessão que você usa para guardar o ID do usuário logado.
+$idFuncionario = isset($_SESSION['id_funcionario']) ? intval($_SESSION['id_funcionario']) : 1; 
+
+// Injeta o ID do funcionário logado no MySQL para que a sua trigger "trg_log_preco_produto" consiga ler
+mysqli_query($conexao, "SET @id_funcionario = $idFuncionario;");
+
 include 'includes/header.php';
 
 if (isset($_GET['delete'])) {
-
     $id = intval($_GET['delete']);
-
     mysqli_query($conexao, "DELETE FROM estoque WHERE id_prod = $id");
     mysqli_query($conexao, "DELETE FROM produto WHERE id = $id");
 
@@ -18,7 +24,6 @@ if (isset($_GET['delete'])) {
 if(isset($_POST['cadastrar_produto'])){
 
     $idProduto = isset($_POST['id_produto']) ? intval($_POST['id_produto']) : 0;
-
     $nome = mysqli_real_escape_string($conexao, trim($_POST['nome']));
     $categoria = intval($_POST['categoria']);
     $fornecedor = intval($_POST['fornecedor']);
@@ -31,9 +36,8 @@ if(isset($_POST['cadastrar_produto'])){
     mysqli_begin_transaction($conexao);
 
     try {
-
         if ($idProduto > 0) {
-
+            // === MODO DE EDIÇÃO ===
             mysqli_query($conexao,"
                 UPDATE produto SET
                     id_forn = $fornecedor,
@@ -45,15 +49,36 @@ if(isset($_POST['cadastrar_produto'])){
                 WHERE id = $idProduto
             ");
 
-            mysqli_query($conexao,"
-                UPDATE estoque SET
-                    qtd = $qtd, 
-                    qtd_minima = $qtd_minima
-                WHERE id_prod = $idProduto
-            ");
+            // Verifica o estoque atual para saber se aumentou
+            $queryEst = mysqli_query($conexao, "SELECT qtd FROM estoque WHERE id_prod = $idProduto");
+            $estAtual = mysqli_fetch_assoc($queryEst)['qtd'];
+            $diferenca = $qtd - $estAtual;
+
+            if ($diferenca > 0) {
+                // A quantidade nova é MAIOR que a antiga. Gera uma compra para a diferença!
+                $valorTotalCompra = $diferenca * $custo;
+                
+                // Registra a Compra
+                mysqli_query($conexao,"INSERT INTO compra (id_forn, id_func, valor_total) VALUES ($fornecedor, $idFuncionario, $valorTotalCompra)");
+                $idCompra = mysqli_insert_id($conexao);
+                
+                // Registra o Item (A sua trigger trg_item_compra_insert vai somar a diferença no estoque)
+                mysqli_query($conexao,"INSERT INTO item_compra (id_compra, id_prod, qtd, preco_unit) VALUES ($idCompra, $idProduto, $diferenca, $custo)");
+                
+                // Atualiza apenas a qtd_minima manualmente
+                mysqli_query($conexao,"UPDATE estoque SET qtd_minima = $qtd_minima WHERE id_prod = $idProduto");
+            } else {
+                // Se a quantidade foi reduzida ou mantida (ajuste de quebra/roubo), atualizamos direto
+                mysqli_query($conexao,"
+                    UPDATE estoque SET
+                        qtd = $qtd, 
+                        qtd_minima = $qtd_minima
+                    WHERE id_prod = $idProduto
+                ");
+            }
 
         } else {
-
+            // === MODO DE CRIAÇÃO (NOVO PRODUTO) ===
             mysqli_query($conexao,"
                 INSERT INTO produto (id_forn,id_cat,id_marca,nome,preco,custo)
                 VALUES ($fornecedor,$categoria,$marca,'$nome',$preco,$custo)
@@ -65,15 +90,26 @@ if(isset($_POST['cadastrar_produto'])){
                 throw new Exception("Erro ao gerar ID do produto");
             }
 
-            // INSERT para novo produto (o trigger cria o estoque, mas inserimos com qtd inicial)
+            // Inserimos o estoque com quantidade ZERO
             mysqli_query($conexao,"
                 INSERT INTO estoque (id_prod,qtd,qtd_minima)
-                VALUES ($idProduto,$qtd,$qtd_minima)
+                VALUES ($idProduto, 0, $qtd_minima)
             ");
+
+            // Se houver quantidade inicial definida, criamos uma compra de entrada
+            if ($qtd > 0) {
+                $valorTotalCompra = $qtd * $custo;
+                
+                // 1. Gera a Compra
+                mysqli_query($conexao,"INSERT INTO compra (id_forn, id_func, valor_total) VALUES ($fornecedor, $idFuncionario, $valorTotalCompra)");
+                $idCompra = mysqli_insert_id($conexao);
+                
+                // 2. Gera o Item (Isso aciona sua trigger que vai somar o $qtd no estoque zerado que acabamos de criar)
+                mysqli_query($conexao,"INSERT INTO item_compra (id_compra, id_prod, qtd, preco_unit) VALUES ($idCompra, $idProduto, $qtd, $custo)");
+            }
         }
 
         mysqli_commit($conexao);
-
         header("Location: ".$_SERVER['PHP_SELF']);
         exit;
 
@@ -85,17 +121,42 @@ if(isset($_POST['cadastrar_produto'])){
 
 if(isset($_POST['entrada_mercadoria'])){
 
-    $produto = intval($_POST['produto']);
-    $qtd = intval($_POST['qtd_entrada']);
+    $produto_id = intval($_POST['produto']);
+    $qtd_entrada = intval($_POST['qtd_entrada']);
 
-    mysqli_query($conexao,"
-        UPDATE estoque
-        SET qtd = qtd + $qtd
-        WHERE id_prod = $produto
-    ");
+    mysqli_begin_transaction($conexao);
+    try {
+        // Busca o fornecedor e custo vinculados a esse produto atualmente
+        $queryProd = mysqli_query($conexao, "SELECT id_forn, custo FROM produto WHERE id = $produto_id");
+        $dadosProd = mysqli_fetch_assoc($queryProd);
 
-    header("Location: ".$_SERVER['PHP_SELF']);
-    exit;
+        if($dadosProd) {
+            $idForn = $dadosProd['id_forn'];
+            $custo = $dadosProd['custo'];
+            $valorTotalCompra = $qtd_entrada * $custo;
+
+            // 1. Gera o registro geral da Compra vinculando ao funcionário logado
+            mysqli_query($conexao,"
+                INSERT INTO compra (id_forn, id_func, valor_total)
+                VALUES ($idForn, $idFuncionario, $valorTotalCompra)
+            ");
+            $idCompra = mysqli_insert_id($conexao);
+
+            // 2. Gera o item da compra. 
+            // Sua trigger no banco 'trg_item_compra_insert' vai automaticamente somar essa quantidade no estoque!
+            mysqli_query($conexao,"
+                INSERT INTO item_compra (id_compra, id_prod, qtd, preco_unit)
+                VALUES ($idCompra, $produto_id, $qtd_entrada, $custo)
+            ");
+        }
+
+        mysqli_commit($conexao);
+        header("Location: ".$_SERVER['PHP_SELF']);
+        exit;
+    } catch (Exception $e) {
+        mysqli_rollback($conexao);
+        die("ERRO: ".$e->getMessage());
+    }
 }
 
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
@@ -231,9 +292,9 @@ $total_pages = ceil($total / $limit);
         <?php endforeach; ?>
     </select>
 
-    <input type="number" step="0.01" name="preco" placeholder="Preço" required>
-    <input type="number" step="0.01" name="custo" placeholder="Custo" required>
-    <input type="number" name="qtd" placeholder="Quantidade inicial" required>
+    <input type="number" step="0.01" name="preco" placeholder="Preço de Venda" required>
+    <input type="number" step="0.01" name="custo" placeholder="Custo de Compra" required>
+    <input type="number" name="qtd" placeholder="Quantidade em Estoque" required>
     <input type="number" name="qtd_minima" placeholder="Quantidade mínima" required>
 
     <button type="submit" name="cadastrar_produto">Salvar</button>
@@ -253,7 +314,7 @@ $total_pages = ceil($total / $limit);
         <?php endforeach; ?>
     </select>
 
-    <input type="number" name="qtd_entrada" placeholder="Quantidade" required>
+    <input type="number" name="qtd_entrada" placeholder="Quantidade a adicionar" required>
 
     <button type="submit" name="entrada_mercadoria">Registrar Entrada</button>
 

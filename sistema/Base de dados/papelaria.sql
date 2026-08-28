@@ -217,6 +217,23 @@ begin
     end if;
 end; //
 
+CREATE TRIGGER trg_compra_financeiro
+AFTER INSERT ON compra
+FOR EACH ROW
+BEGIN
+    -- Se a compra tiver um valor gerado, registra automaticamente como despesa (Saída)
+    IF NEW.valor_total IS NOT NULL AND NEW.valor_total > 0 THEN
+        INSERT INTO movimentacao_financeira (tipo, descricao, valor, dt_mov, id_compra)
+        VALUES (
+            'Saida', 
+            CONCAT('Compra de mercadoria - Pedido #', NEW.id), 
+            NEW.valor_total, 
+            DATE(NEW.dt_compra), 
+            NEW.id
+        );
+    END IF;
+END; //
+
 -- Trigger: Histórico de alteração de produto (com captura do Funcionário)
 create trigger trg_log_preco_produto
 after update on produto

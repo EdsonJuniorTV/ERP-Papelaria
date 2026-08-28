@@ -1,12 +1,78 @@
 <?php 
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    if(!isset($_SESSION['user_id'])) {
+        header("Location: index.php?erro=2");
+        exit;
+    }
+
     require_once 'config/conexao.php';
+
+    // -------------------------------------------------------------------------
+    // PROCESSAMENTO DA VENDA VIA AJAX (Recebe os dados do JavaScript)
+    // -------------------------------------------------------------------------
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        if (isset($input['acao']) && $input['acao'] === 'finalizar_venda') {
+            header('Content-Type: application/json');
+            
+            try {
+                mysqli_begin_transaction($conexao);
+                
+                $id_func = $_SESSION['user_id'];
+                $id_cli = intval($input['id_cliente']);
+                
+                if ($id_cli <= 0) {
+                    throw new Exception("Por favor, selecione um cliente válido.");
+                }
+                
+                // 1. Cria o Pedido com status 'Aberto'
+                $stmt = mysqli_prepare($conexao, "INSERT INTO pedido (id_cli, id_func, status) VALUES (?, ?, 'Aberto')");
+                mysqli_stmt_bind_param($stmt, "ii", $id_cli, $id_func);
+                mysqli_stmt_execute($stmt);
+                $id_ped = mysqli_insert_id($conexao);
+                
+                // 2. Insere os Itens do Pedido (Isso aciona as Triggers de Estoque e Comissão)
+                $stmt_item = mysqli_prepare($conexao, "INSERT INTO item_pedido (id_ped, id_prod, qtd, preco_unitario) VALUES (?, ?, ?, ?)");
+                foreach ($input['carrinho'] as $item) {
+                    $id_prod = intval($item['cod']);
+                    $qtd = intval($item['qtd']);
+                    $preco = floatval($item['preco']);
+                    
+                    mysqli_stmt_bind_param($stmt_item, "iiid", $id_ped, $id_prod, $qtd, $preco);
+                    mysqli_stmt_execute($stmt_item);
+                }
+                
+                // 3. Atualiza para 'Pago' (Isso aciona a Trigger que cria a movimentação financeira)
+                $stmt_pago = mysqli_prepare($conexao, "UPDATE pedido SET status = 'Pago' WHERE id = ?");
+                mysqli_stmt_bind_param($stmt_pago, "i", $id_ped);
+                mysqli_stmt_execute($stmt_pago);
+                
+                mysqli_commit($conexao);
+                echo json_encode(['sucesso' => true, 'id_pedido' => $id_ped]);
+                
+            } catch (Exception $e) {
+                mysqli_rollback($conexao);
+                echo json_encode(['sucesso' => false, 'erro' => $e->getMessage()]);
+            }
+            exit; // Interrompe o script para não renderizar o HTML no retorno do AJAX
+        }
+    }
+    // -------------------------------------------------------------------------
+
+    $idFuncionario = $_SESSION['user_id'];
+    $nomeFuncionario = $_SESSION['user_nome'];
+
     include 'includes/header.php';
 
     $filtroNome = isset($_GET['nome']) ? trim($_GET['nome']) : '';
     $filtroFornecedor = isset($_GET['fornecedor']) ? intval($_GET['fornecedor']) : 0;
     $filtroMarca = isset($_GET['marca']) ? intval($_GET['marca']) : 0;
 
-    $clientes = mysqli_query($conexao, "SELECT id, nome FROM cliente");
+    $clientes = mysqli_query($conexao, "SELECT id, nome, cpf FROM cliente");
 
     $fornecedores = mysqli_fetch_all(mysqli_query($conexao, "SELECT id, nome FROM fornecedor ORDER BY nome ASC"), MYSQLI_ASSOC);
     $marcas = mysqli_fetch_all(mysqli_query($conexao, "SELECT id, nome FROM marca ORDER BY nome ASC"), MYSQLI_ASSOC);
@@ -38,7 +104,7 @@
     $produtos = mysqli_query($conexao, $sql);
 
     $custo_total = mysqli_fetch_assoc(
-    mysqli_query($conexao,"SELECT SUM(p.custo * e.qtd) as total FROM produto p JOIN estoque e ON p.id = e.id_prod WHERE e.qtd > 0")
+        mysqli_query($conexao,"SELECT SUM(p.custo * e.qtd) as total FROM produto p JOIN estoque e ON p.id = e.id_prod WHERE e.qtd > 0")
     )['total'] ?? 0;
 ?>
 
@@ -54,6 +120,7 @@
     <div class="wrap">
         <h1>Caixa</h1>
 
+        <!-- TELA 1: Seleção de Produtos -->
         <div id="tela1" class="grid">
 
             <div class="card">
@@ -82,9 +149,7 @@
                         <?php endforeach;?>
                     </select>
 
-                    <button type="submit">
-                        Filtrar
-                    </button>
+                    <button type="submit">Filtrar</button>
                 </form>
 
                 <div class="table">
@@ -95,6 +160,7 @@
                         <div>Fornecedor</div>
                         <div>Preço</div>
                         <div>Estoque</div>
+                        <div></div>
                     </div>
 
                     <div class="tbody">
@@ -112,7 +178,7 @@
                                     <button class="botaoAdd" 
                                     onclick="addCarrinho(
                                     '<?php echo $p['id']; ?>',
-                                    '<?php echo $p['nome']; ?>',
+                                    '<?php echo addslashes($p['nome']); ?>',
                                     <?php echo $p['preco']; ?>,
                                     <?php echo $p['custo']; ?>)">
                                         +
@@ -137,23 +203,32 @@
 
         </div>
 
+        <!-- TELA 2: Pagamento e Finalização -->
         <div id="tela2" class="grid" style="display:none;">
 
             <div class="card">
                 <h2>Comanda</h2>
                 <div id="resumo-comanda"></div>
 
-                    <h3 style="margin-top:15px;">Nota Fiscal</h3>
-                    <div id="nota"></div>
-                </div>
+                <h3 style="margin-top:15px;">Nota Fiscal</h3>
+                <div id="nota"></div>
+            </div>
 
             <div class="card">
                 <h2>Pagamento</h2>
 
                 <div>Total: <b id="total2">R$ 0,00</b></div>
 
-                <select id="forma_pagamento">
-                    <option value="">Selecione</option>
+                <!-- Adicionado a seleção de cliente obrigatoria para a tabela pedido -->
+                <select id="cliente_id" style="margin-top: 10px;">
+                    <option value="">Selecione o Cliente</option>
+                    <?php while($cli = mysqli_fetch_assoc($clientes)) { ?>
+                        <option value="<?= $cli['id']; ?>"><?= $cli['nome']; ?> (CPF: <?= $cli['cpf']; ?>)</option>
+                    <?php } ?>
+                </select>
+
+                <select id="forma_pagamento" style="margin-top: 10px;">
+                    <option value="">Forma de Pagamento</option>
                     <option>Dinheiro</option>
                     <option>Cartão</option>
                     <option>Pix</option>
@@ -168,133 +243,114 @@
                         <option value="4">4x</option>
                         <option value="5">5x</option>
                         <option value="6">6x</option>
-                        <option value="7">7x</option>
-                        <option value="8">8x</option>
-                        <option value="9">9x</option>
-                        <option value="10">10x</option>
-                        <option value="11">11x</option>
-                        <option value="12">12x</option>
                     </select>
                     <div id="valor-parcela"></div>
                 </div>
 
-                <input type="number" id="valor_pago" placeholder="Valor pago">
+                <input type="number" id="valor_pago" placeholder="Valor pago" style="margin-top: 10px;">
                 <div>Troco: <b id="troco">R$ 0,00</b></div>
 
-                <div id="msg"></div>
-                    <button class="btn ok" onclick="finalizar()" ondblclick="irFinanceiro()">Finalizar Venda</button>
-                </div>
+                <div id="msg" style="color: red; font-weight: bold; margin-top: 10px;"></div>
+                
+                <button id="btn-finalizar" class="btn ok" onclick="finalizar()">Finalizar Venda</button>
+                <button class="btn" style="background:#ccc; color:#333;" onclick="voltarTela1()">Voltar</button>
             </div>
         </div>
 
+        <!-- TELA 3: Financeiro -->
         <div id="tela3" class="grid" style="display:none;">
             <div class="card">
                 <h2>Financeiro</h2>
-
-                <div>Investimento atual:</div>
-                <b id="f_investido"></b>
-
-                <br><br>
-
-                <div>Meta (investimento + 2000):</div>
-                <b id="f_meta"></b>
-
-                <br><br>
-
-                <div>Total em caixa:</div>
-                <b id="f_total"></b>
-
-                <br><br>
-
-                <div>Resultado:</div>
-                <b id="f_resultado"></b>
-
-                <br><br>
-
-                <button onclick="resetar()">Finalizar</button>
+                <div>Investimento atual:</div><b id="f_investido"></b><br><br>
+                <div>Meta (investimento + 2000):</div><b id="f_meta"></b><br><br>
+                <div>Total em caixa:</div><b id="f_total"></b><br><br>
+                <div>Resultado:</div><b id="f_resultado"></b><br><br>
+                <button class="btn ok" onclick="resetar()">Novo Atendimento</button>
             </div>
         </div>
     </div>
+    
     <script>
         let carrinho = [];
         let totalInvestido = <?php echo $custo_total; ?>;
         let caixa = 0;
 
-        let comanda=Math.floor(Math.random()*1000);
-        document.getElementById('num-comanda').innerText='#'+comanda;
+        let comanda = Math.floor(Math.random()*1000);
+        document.getElementById('num-comanda').innerText = '#' + comanda;
 
         function dinheiro(v) { return 'R$ '+ v.toFixed(2).replace('.',','); }   
 
         function atualizar(){
             let html = '', total = 0;
-            carrinho.forEach(i=>{
+            carrinho.forEach(i => {
                 let sub = i.preco * i.qtd;
                 total += sub;
                 html += i.nome + " x" + i.qtd + " - " + dinheiro(sub) + "<br>";
             });
             document.getElementById('lista-comanda').innerHTML = html;
-            document.getElementById('total1').innerText=dinheiro(total);
+            document.getElementById('total1').innerText = dinheiro(total);
         }
 
         function addCarrinho(c,n,p,ct){
             let est = document.getElementById('est_'+c);
+            if(parseInt(est.innerText) <= 0) return alert('Sem estoque para este produto.');
 
-            if(parseInt(est.innerText)<=0)return alert('Sem estoque');
-
-            est.innerText=parseInt(est.innerText)-1;
-
-            let i = carrinho.find(x=>x.cod==c);
-
-            if(i)i.qtd++; else carrinho.push({cod:c,nome:n,preco:p,custo:ct,qtd:1});
-
+            est.innerText = parseInt(est.innerText) - 1;
+            let i = carrinho.find(x => x.cod == c);
+            if(i) i.qtd++; else carrinho.push({cod:c, nome:n, preco:p, custo:ct, qtd:1});
             atualizar();
         }
 
         function removerCarrinho(c){
-
-            let i=carrinho.find(x=>x.cod==c);
-
-            if(!i || i.qtd<=0){
+            let i = carrinho.find(x => x.cod == c);
+            if(!i || i.qtd <= 0){
                 alert('Este produto não está no carrinho');
                 return;
             }
 
-            let est=document.getElementById('est_'+c);
-            est.innerText=parseInt(est.innerText)+1;
+            let est = document.getElementById('est_'+c);
+            est.innerText = parseInt(est.innerText) + 1;
             i.qtd--;
             
-            if(i.qtd===0){
-                carrinho=carrinho.filter(x=>x.cod!=c);
+            if(i.qtd === 0){
+                carrinho = carrinho.filter(x => x.cod != c);
             }
-
             atualizar();
         }
 
         function irTela2(){
-            if(carrinho.length==0)return;
+            if(carrinho.length == 0) {
+                alert("O carrinho está vazio!");
+                return;
+            }
 
             document.getElementById('tela1').style.display='none';
             document.getElementById('tela2').style.display='grid';
 
-            let total=0,resumo="";
-
-            carrinho.forEach(i=>{
-                let sub=i.preco*i.qtd;
-                total+=sub;
-                resumo+=i.nome+" x"+i.qtd+" - "+dinheiro(sub)+"<br>";
+            let total = 0, resumo = "";
+            carrinho.forEach(i => {
+                let sub = i.preco * i.qtd;
+                total += sub;
+                resumo += i.nome+" x"+i.qtd+" - "+dinheiro(sub)+"<br>";
             });
 
-            document.getElementById('resumo-comanda').innerHTML=resumo;
-            document.getElementById('nota').innerHTML="";
-            document.getElementById('total2').innerText=dinheiro(total);
+            document.getElementById('resumo-comanda').innerHTML = resumo;
+            document.getElementById('nota').innerHTML = "";
+            document.getElementById('total2').innerText = dinheiro(total);
+        }
+
+        function voltarTela1() {
+            document.getElementById('tela2').style.display = 'none';
+            document.getElementById('tela1').style.display = 'grid';
+            document.getElementById('msg').innerText = '';
         }
 
         document.getElementById('forma_pagamento').addEventListener('change',function(){
-            let f=this.value;
-            let area=document.getElementById('parcelas-area');
-            let campo=document.getElementById('valor_pago');
+            let f = this.value;
+            let area = document.getElementById('parcelas-area');
+            let campo = document.getElementById('valor_pago');
 
-            if(f==="Cartão" || f==="Pix"){
+            if(f === "Cartão"){
                 area.style.display='block';
                 calcularParcelas();
             } else{
@@ -305,83 +361,143 @@
             }
         });
 
-        document.getElementById('parcelas').addEventListener('change',calcularParcelas);
+        document.getElementById('parcelas').addEventListener('change', calcularParcelas);
 
         function calcularParcelas(){
-            let total=parseFloat(document.getElementById('total2').innerText.replace('R$ ','').replace(',','.'))||0;
-            let p=parseInt(document.getElementById('parcelas').value);
-            let valor=total/p;
+            let total = parseFloat(document.getElementById('total2').innerText.replace('R$ ','').replace(',','.'))||0;
+            let p = parseInt(document.getElementById('parcelas').value);
+            let valor = total / p;
 
-            document.getElementById('valor-parcela').innerText=p+"x de "+dinheiro(valor);
+            document.getElementById('valor-parcela').innerText = p+"x de "+dinheiro(valor);
 
-            let campo=document.getElementById('valor_pago');
-            campo.value=valor.toFixed(2);
-            campo.readOnly=true;
-            document.getElementById('troco').innerText='R$ 0,00';
+            let campo = document.getElementById('valor_pago');
+            campo.value = valor.toFixed(2);
+            campo.readOnly = true;
+            document.getElementById('troco').innerText = 'R$ 0,00';
         }
 
         document.getElementById('valor_pago').addEventListener('input',function(){
-            let f=document.getElementById('forma_pagamento').value;
-            if(f==="Cartão" || f==="Pix")return;
+            let f = document.getElementById('forma_pagamento').value;
+            if(f === "Cartão") return;
 
-            let total=parseFloat(document.getElementById('total2').innerText.replace('R$ ','').replace(',','.'))||0;
-            let pago=parseFloat(this.value)||0;
-            let troco=pago-total;
+            let total = parseFloat(document.getElementById('total2').innerText.replace('R$ ','').replace(',','.'))||0;
+            let pago = parseFloat(this.value)||0;
+            let troco = pago - total;
 
-            document.getElementById('troco').innerText=troco>0?dinheiro(troco):'R$ 0,00';
+            document.getElementById('troco').innerText = troco > 0 ? dinheiro(troco) : 'R$ 0,00';
         });
 
-        function finalizar(){
+        // FUNÇÃO ATUALIZADA COM FETCH API PARA COMUNICAR COM O BANCO
+        async function finalizar(){
+            let forma = document.getElementById('forma_pagamento').value;
 
-            let forma=document.getElementById('forma_pagamento').value;
+            let clienteSelect = document.getElementById('cliente_id');
+            let cliente_id = clienteSelect.value;
 
+            let btn = document.getElementById('btn-finalizar');
+            let msgBox = document.getElementById('msg');
+
+            if(!cliente_id){
+                msgBox.innerText = 'Selecione o Cliente antes de finalizar.';
+                return;
+            }
             if(!forma){
-                document.getElementById('msg').innerText='Escolha a forma de pagamento';
+                msgBox.innerText = 'Escolha a forma de pagamento.';
                 return;
             }
 
-            let total=0,custo=0,notaHtml="";
+            let nomeCliente = clienteSelect.options[clienteSelect.selectedIndex].text;
 
-            carrinho.forEach(i=>{
-                let sub=i.preco*i.qtd;
-                total+=sub;
-                custo+=i.custo*i.qtd;
-                notaHtml+=i.nome+" x"+i.qtd+" - "+dinheiro(sub)+"<br>";
-            });
+            msgBox.style.color = 'blue';
+            msgBox.innerText = 'Processando venda...';
+            btn.disabled = true;
 
-            caixa+=total;
-            totalInvestido-=custo;
+            let payload = {
+                acao: 'finalizar_venda',
+                id_cliente: cliente_id,
+                forma_pagamento: forma,
+                carrinho: carrinho
+            };
 
-            document.getElementById('nota').innerHTML = `
-            <b>Comanda:</b> #${comanda}<br><br>
-            ${notaHtml}
-            <br><b>Total:</b> ${dinheiro(total)}
-            `;
+            try {
+                // Envia para o bloco PHP no topo deste arquivo
+                let response = await fetch(window.location.href, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                
+                let res = await response.json();
 
-            document.getElementById('msg').innerText='Venda finalizada';
+                if(res.sucesso) {
+                    let total=0, custo=0, notaHtml="";
+
+                    carrinho.forEach(i => {
+                        let sub = i.preco * i.qtd;
+                        total += sub;
+                        custo += i.custo * i.qtd;
+                        notaHtml += i.nome + " x" + i.qtd + " - " + dinheiro(sub) + "<br>";
+                    });
+
+                    caixa += total;
+                    totalInvestido -= custo;
+                    
+                    let nomeVendedor = "<?php echo addslashes($nomeFuncionario); ?>";
+
+                    document.getElementById('nota').innerHTML = `
+                    <b>Nº do Pedido (Banco):</b> #${res.id_pedido}<br>
+                    <b>Vendedor:</b> ${nomeVendedor} <br>
+                    <b>Cliente:</b> ${nomeCliente} <br><br>
+                    ${notaHtml}
+                    <br><b>Total:</b> ${dinheiro(total)}
+                    `;
+
+                    msgBox.style.color = 'green';
+                    msgBox.innerText = 'Venda gravada no sistema com sucesso!';
+
+                    setTimeout(resetar, 4000);
+                } else {
+                    msgBox.style.color = 'red';
+                    msgBox.innerText = 'Erro do banco: ' + res.erro;
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                msgBox.style.color = 'red';
+                msgBox.innerText = 'Erro na comunicação com o servidor.';
+                btn.disabled = false;
+            }
         }
 
         function irFinanceiro(){
-
-            let meta=totalInvestido+2000;
-            let resultado=caixa-totalInvestido;
+            let meta = totalInvestido + 2000;
+            let resultado = caixa - totalInvestido;
 
             document.getElementById('tela2').style.display='none';
             document.getElementById('tela3').style.display='grid';
 
-            document.getElementById('f_investido').innerText=dinheiro(totalInvestido);
-            document.getElementById('f_meta').innerText=dinheiro(meta);
-            document.getElementById('f_total').innerText=dinheiro(caixa);
+            document.getElementById('f_investido').innerText = dinheiro(totalInvestido);
+            document.getElementById('f_meta').innerText = dinheiro(meta);
+            document.getElementById('f_total').innerText = dinheiro(caixa);
 
-            if(resultado>=0){
+            if(resultado >= 0){
                 document.getElementById('f_resultado').innerText="Lucro: "+dinheiro(resultado);
+                document.getElementById('f_resultado').style.color="green";
             } else{
                 document.getElementById('f_resultado').innerText="Prejuízo: "+dinheiro(resultado);
+                document.getElementById('f_resultado').style.color="red";
             }
         }
 
         function resetar(){
-            carrinho=[];
+            carrinho = [];
+            document.getElementById('btn-finalizar').disabled = false;
+            document.getElementById('msg').innerText = '';
+            document.getElementById('cliente_id').value = '';
+            document.getElementById('forma_pagamento').value = '';
+            document.getElementById('valor_pago').value = '';
+            document.getElementById('troco').innerText = 'R$ 0,00';
+            document.getElementById('resumo-comanda').innerHTML = '';
+            document.getElementById('nota').innerHTML = '';
 
             document.getElementById('tela3').style.display='none';
             document.getElementById('tela1').style.display='grid';
@@ -389,7 +505,7 @@
             document.getElementById('lista-comanda').innerHTML='';
             document.getElementById('total1').innerText='R$ 0,00';
 
-            let comanda=Math.floor(Math.random()*1000);
+            comanda = Math.floor(Math.random()*1000);
             document.getElementById('num-comanda').innerText='#'+comanda;
         }
     </script>
