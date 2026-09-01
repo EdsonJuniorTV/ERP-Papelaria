@@ -3,13 +3,28 @@ const form = document.getElementById("form");
 
 // Máscaras de CPF, Telefone e CEP
 const mascaras = {
-    cpf: (v) => v.replace(/\D/g, '').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2'),
-    fone: (v) => v.replace(/\D/g, '').replace(/^(\d{2})(\d)/g, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2'),
-    cep: (v) => v.replace(/\D/g, '').replace(/(\d{5})(\d)/, '$1-$2')
+    cpf: (v) => v.replace(/\D/g, '')
+                .slice(0, 11)
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d{1,2})$/, '$1-$2'),
+    cnpj: (v) => v.replace(/\D/g, '')
+                .slice(0, 14)
+                .replace(/^(\d{2})(\d)/, '$1.$2')
+                .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+                .replace(/\.(\d{3})(\d)/, '.$1/$2')
+                .replace(/(\d{4})(\d{1,2})$/, '$1-$2'),
+    fone: (v) => v.replace(/\D/g, '')
+                .slice(0, 11)
+                .replace(/^(\d{2})(\d)/g, '($1) $2')
+                .replace(/(\d{5})(\d)/, '$1-$2'),
+    cep: (v) => v.replace(/\D/g, '')
+                .slice(0, 8)
+                .replace(/(\d{5})(\d)/, '$1-$2')
 };
 
 // Aplica as máscaras apenas se os elementos existirem na página atual
-['cpf', 'fone', 'cep'].forEach(id => {
+['cpf', 'cnpj', 'fone', 'cep'].forEach(id => {
     const el = document.getElementById(id);
     if(el) el.addEventListener('input', (e) => e.target.value = mascaras[id](e.target.value));
 });
@@ -128,6 +143,7 @@ if (form) {
         
         // Removemos as máscaras antes de enviar para o banco (valida se o dado existe)
         if (dados.cpf) dados.cpf = dados.cpf.replace(/\D/g, '');
+        if (dados.cnpj) dados.cnpj = dados.cnpj.replace(/\D/g, '');
         if (dados.fone) dados.fone = dados.fone.replace(/\D/g, '');
         if (dados.cep) dados.cep = dados.cep.replace(/\D/g, '');
 

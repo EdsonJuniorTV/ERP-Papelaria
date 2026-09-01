@@ -22,12 +22,12 @@ include 'includes/header.php';
                 
                 <div class="form-group">
                     <label>CNPJ <span>*</span></label>
-                    <input type="text" id="cnpj" name="cnpj" placeholder="00.000.000/0001-00" required>
+                    <input type="text" id="cnpj" name="cnpj" placeholder="Ex: 00.000.000/0000-00" maxlength="18" required>
                 </div>
 
                 <div class="form-group">
                     <label>Telefone Comercial</label>
-                    <input type="text" id="fone" name="fone">
+                    <input type="text" id="fone" name="fone" placeholder="Ex: (00)00000-0000" maxlength="15">
                 </div>
 
                 <div class="form-group">
@@ -37,7 +37,7 @@ include 'includes/header.php';
 
                 <div class="form-group form-group-full" style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 10px;">
                     <label>CEP</label>
-                    <input type="text" id="cep" name="cep" placeholder="Ex: 00000-000">
+                    <input type="text" id="cep" name="cep" placeholder="Ex: 00000-000" maxlength="9">
                 </div>
 
                 <div class="form-group">

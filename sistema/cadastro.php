@@ -21,7 +21,7 @@ include 'includes/header.php';    // Traz o Menu e o CSS
 
                 <div class="form-group">
                     <label>CPF <span>*</span></label>
-                    <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" required>
+                    <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" maxlength="14" required>
                 </div>
 
                 <div class="form-group">
@@ -36,7 +36,7 @@ include 'includes/header.php';    // Traz o Menu e o CSS
 
                 <div class="form-group">
                     <label>Telefone / WhatsApp</label>
-                    <input type="text" id="fone" name="fone" placeholder="(00) 00000-0000">
+                    <input type="text" id="fone" name="fone" placeholder="(00) 00000-0000" maxlength="15">
                 </div>
 
                 <div class="form-group form-group-full" style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 10px;">
@@ -45,7 +45,7 @@ include 'includes/header.php';    // Traz o Menu e o CSS
                 
                 <div class="form-group">
                     <label>CEP</label>
-                    <input type="text" id="cep" name="cep" placeholder="00000-000">
+                    <input type="text" id="cep" name="cep" placeholder="00000-000" maxlength="9">
                 </div>
 
                 <div class="form-group">

@@ -137,7 +137,7 @@ $funcionarios = mysqli_fetch_all(
 
                     <div class="form-group">
                         <label>CPF <span style="color:red;">*</span></label>
-                        <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" required>
+                        <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" maxlength="14" required>
                     </div>
 
                     <div class="form-group">
@@ -174,7 +174,7 @@ $funcionarios = mysqli_fetch_all(
 
                     <div class="form-group">
                         <label>Telefone</label>
-                        <input type="text" id="fone" name="fone" placeholder="(00) 00000-0000">
+                        <input type="text" id="fone" name="fone" placeholder="(00) 00000-0000" maxlength="15">
                     </div>
 
                     <div class="form-group">
@@ -184,7 +184,7 @@ $funcionarios = mysqli_fetch_all(
 
                     <div class="form-group form-group-full">
                         <label>CEP</label>
-                        <input type="text" name="cep" id="cep" placeholder="Ex: 00000-000">
+                        <input type="text" name="cep" id="cep" placeholder="Ex: 00000-000" maxlength="9">
                     </div>
                     <div class="form-group">
                         <label>Endereço Residencial</label>
