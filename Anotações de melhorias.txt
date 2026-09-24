@@ -1,0 +1,4 @@
+Padronizar a estilização do caixa, estoque e financeiro;
+Arrumar o carregamento esquisito da parte de pagamento do caixa;
+Adicionar a capacidade de editar e excluir clientes;
+Talvez adicionar keyframes para os ícones do sistema;
