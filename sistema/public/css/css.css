@@ -190,6 +190,9 @@ main { flex: 1; padding: 28px 32px; }
 
 /* Compatibilidade com o antigo .header dentro de .container */
 .container .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   border-radius:  10px;
   padding: 22px 28px;
   color: #fff;
@@ -318,15 +321,17 @@ form { padding: 24px 28px 28px; }
 .form-group select { cursor: pointer; }
 
 /* ── Botões ────────────────────────────────────────────────── */
+
+/* 1. Base estrutural compartilhada por todos os botões */
 .btn-submit,
 button[type="submit"],
-button.btn-submit {
+.btn-danger,
+.btn-success {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 7px;
   padding: 10px 22px;
-  background: var(--brand);
   color: #fff;
   border: none;
   border-radius: var(--radius);
@@ -335,6 +340,22 @@ button.btn-submit {
   font-weight: 600;
   cursor: pointer;
   transition: background .15s, transform .12s, box-shadow .15s;
+}
+
+/* Retorno ao estado normal ao clicar */
+.btn-submit:active,
+button[type="submit"]:active,
+.btn-danger:active,
+.btn-success:active { 
+  transform: translateY(0); 
+}
+
+/* 2. Cores e efeitos individuais */
+
+/* Botão Padrão (Azul) */
+.btn-submit,
+button[type="submit"] {
+  background: var(--brand);
   box-shadow: 0 2px 6px rgba(26,86,219,.3);
 }
 .btn-submit:hover,
@@ -343,20 +364,51 @@ button[type="submit"]:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(26,86,219,.35);
 }
-.btn-submit:active { transform: translateY(0); }
 
-.btn-danger  { background: var(--red);    box-shadow: 0 2px 6px rgba(224,36,36,.3); }
-.btn-danger:hover { background: #b91c1c; }
-.btn-success { background: var(--green);  box-shadow: 0 2px 6px rgba(14,159,110,.3); }
-.btn-success:hover { background: #047857; }
+/* Botão de Perigo (Vermelho) */
+.btn-danger { 
+  background: var(--red);    
+  box-shadow: 0 2px 6px rgba(224,36,36,.3); 
+}
+.btn-danger:hover { 
+  background: #b91c1c; 
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(224,36,36,.35);
+}
+
+/* Botão de Sucesso (Verde) */
+.btn-success { 
+  background: var(--green);  
+  box-shadow: 0 2px 6px rgba(14,159,110,.3); 
+}
+.btn-success:hover { 
+  background: #047857; 
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(14,159,110,.35);
+}
+
+/* Botão Fantasma (Contorno) */
 .btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 22px;
+  border-radius: var(--radius);
+  font-family: var(--font-display);
+  font-size: .9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, color .15s;
   background: transparent;
   border: 1.5px solid var(--border);
   color: var(--text-muted);
   box-shadow: none;
 }
-.btn-ghost:hover { background: var(--surface-alt); color: var(--text); }
-
+.btn-ghost:hover { 
+  background: var(--surface-alt); 
+  color: var(--text); 
+}
 /* ── Tabelas ───────────────────────────────────────────────── */
 table {
   width: 100%;

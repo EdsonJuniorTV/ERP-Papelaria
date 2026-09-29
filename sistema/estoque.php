@@ -219,17 +219,15 @@ $total_pages = ceil($total / $limit);
 
 <div class="container" style="max-width:95%;">
 
-<div style="background:#2d3748; padding:15px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-    <h1 style="color:white;">📦 Controle de Estoque</h1>
+<div class="header">
+    <h1>📦 Controle de Estoque</h1>
 
     <div style="display:flex; gap:10px;">
-        <button onclick="toggleModal('modal-cadastro')"
-                style="background:#3182ce; color:white; padding:10px 20px; border:none; border-radius:5px;">
+        <button onclick="toggleModal('modal-cadastro')" class="btn-success">
             + Nova Mercadoria
         </button>
 
-        <button onclick="toggleModal('modal-entrada')"
-                style="background:#48bb78; color:white; padding:10px 20px; border:none; border-radius:5px;">
+        <button onclick="toggleModal('modal-entrada')" class="btn-success">
             + Entrada de Mercadoria
         </button>
     </div>

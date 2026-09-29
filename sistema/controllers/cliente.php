@@ -29,6 +29,10 @@ function cadastrarCliente($data, $conn) {
 }
 
 function listarClientes($conn) {
-    $res = $conn->query("SELECT * FROM cliente ORDER BY nome ASC");
+    $sql = "SELECT c.*, e.logradouro, e.cidade, e.estado, e.cep 
+    FROM cliente c LEFT JOIN endereco e ON c.id_end = e.id 
+    ORDER BY c.nome ASC";
+            
+    $res = $conn->query($sql);
     return $res->fetch_all(MYSQLI_ASSOC);
 }

@@ -71,76 +71,84 @@ while ($row = mysqli_fetch_assoc($res_grafico)) {
 <!-- Biblioteca Chart.js para o gráfico -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<main class="container">
-    <div class="header" style="background: #27ae60; color: #fff; padding: 20px; border-radius: 8px;">
-        <h1>💰 Painel Financeiro</h1>
-        <p>Acompanhe o desempenho do caixa e o fluxo de vendas</p>
-    </div>
-
-    <!-- Filtro por Mês e Ano -->
-    <form method="GET" style="margin-top: 20px; background: #fff; padding: 15px; border-radius: 8px; display: flex; gap: 10px; align-items: center;">
-        <label><b>Filtrar Período:</b></label>
-        <select name="mes" style="padding: 5px;">
-            <?php // gerador simples de meses ?>
-            <?php for($m = 1; $m <= 12; $m++): ?>
-                <option value="<?= $m ?>" <?= ($mes_selecionado == $m) ? 'selected' : '' ?>>
-                    <?= date('F', mktime(0, 0, 0, $m, 10)) ?>
-                </option>
-            <?php endfor; ?>
-        </select>
-        <select name="ano" style="padding: 5px;">
-            <?php for($a = date('Y'); $a >= date('Y') - 3; $a--): ?>
-                <option value="<?= $a ?>" <?= ($ano_selecionado == $a) ? 'selected' : '' ?>><?= $a ?></option>
-            <?php endfor; ?>
-        </select>
-        <button type="submit" class="btn" style="padding: 6px 15px; background: #2980b9; color: #fff; border: none; border-radius: 4px;">Filtrar</button>
-    </form>
-
-    <!-- Indicadores Principais -->
-    <div class="grid-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">
-        <div class="card" style="border-left: 5px solid green; padding: 15px; background: #fff; border-radius: 6px;">
-            <h4>Entradas (Vendas)</h4>
-            <p style="font-size: 22px; font-weight: bold; color: green;">R$ <?= number_format($total_entradas, 2, ',', '.') ?></p>
-        </div>
-        <div class="card" style="border-left: 5px solid red; padding: 15px; background: #fff; border-radius: 6px;">
-            <h4>Saídas (Custos/Comissões)</h4>
-            <p style="font-size: 22px; font-weight: bold; color: red;">R$ <?= number_format($total_saidas, 2, ',', '.') ?></p>
-        </div>
-        <div class="card" style="border-left: 5px solid #2980b9; padding: 15px; background: #fff; border-radius: 6px;">
-            <h4>Saldo Líquido</h4>
-            <p style="font-size: 22px; font-weight: bold; color: <?= $lucro >= 0 ? '#27ae60' : '#c0392b' ?>;">
-                R$ <?= number_format($lucro, 2, ',', '.') ?>
-            </p>
-        </div>
-        <div class="card" style="border-left: 5px solid #8e44ad; padding: 15px; background: #fff; border-radius: 6px;">
-            <h4>Estoque Investido</h4>
-            <p style="font-size: 22px; font-weight: bold; color: #8e44ad;">R$ <?= number_format($total_investido, 2, ',', '.') ?></p>
+<main class="dashboard-container">
+    <div class="header" style="margin-bottom: 20px;">
+        <div>
+            <h1>💰 Painel Financeiro</h1>
+            <p>Acompanhe o desempenho do caixa e o fluxo de vendas</p>
         </div>
     </div>
+    <div style="padding: 0 28px;">
+            <!-- Filtro por Mês e Ano -->
+        <form method="GET" style="margin-top: 20px; background: #fff; padding: 15px; border-radius: 8px; display: flex; gap: 10px; align-items: center;">
+            <label><b>Filtrar Período:</b></label>
+            <select name="mes" style="padding: 5px;">
+                <?php 
+                $meses_pt = [
+                    1 => 'Janeiro', 2 => 'Fevereiro', 3 => 'Março', 4 => 'Abril', 
+                    5 => 'Maio', 6 => 'Junho', 7 => 'Julho', 8 => 'Agosto', 
+                    9 => 'Setembro', 10 => 'Outubro', 11 => 'Novembro', 12 => 'Dezembro'
+                ];
+                for($m = 1; $m <= 12; $m++): ?>
+                    <option value="<?= $m ?>" <?= ($mes_selecionado == $m) ? 'selected' : '' ?>>
+                        <?= $meses_pt[$m] ?>
+                    </option>
+                <?php endfor; ?>
+            </select>
+            <select name="ano" style="padding: 5px;">
+                <?php for($a = date('Y'); $a >= date('Y') - 3; $a--): ?>
+                    <option value="<?= $a ?>" <?= ($ano_selecionado == $a) ? 'selected' : '' ?>><?= $a ?></option>
+                <?php endfor; ?>
+            </select>
+            <button type="submit" class="btn" style="padding: 6px 15px; background: #2980b9; color: #fff; border: none; border-radius: 4px;">Filtrar</button>
+        </form>
 
-    <!-- Grid com Gráfico e Produtos Mais Vendidos -->
-    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 25px;">
-        <!-- Gráfico -->
-        <div class="card" style="padding: 20px; background: #fff; border-radius: 8px;">
-            <h3>📊 Fluxo Diário do Mês</h3>
-            <canvas id="graficoFinanceiro" style="max-height: 320px;"></canvas>
+        <!-- Indicadores Principais -->
+        <div class="grid-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">
+            <div class="card" style="border-left: 5px solid green; padding: 15px; background: #fff; border-radius: 6px;">
+                <h4>Entradas (Vendas)</h4>
+                <p style="font-size: 22px; font-weight: bold; color: green;">R$ <?= number_format($total_entradas, 2, ',', '.') ?></p>
+            </div>
+            <div class="card" style="border-left: 5px solid red; padding: 15px; background: #fff; border-radius: 6px;">
+                <h4>Saídas (Custos/Comissões)</h4>
+                <p style="font-size: 22px; font-weight: bold; color: red;">R$ <?= number_format($total_saidas, 2, ',', '.') ?></p>
+            </div>
+            <div class="card" style="border-left: 5px solid #2980b9; padding: 15px; background: #fff; border-radius: 6px;">
+                <h4>Saldo Líquido</h4>
+                <p style="font-size: 22px; font-weight: bold; color: <?= $lucro >= 0 ? '#27ae60' : '#c0392b' ?>;">
+                    R$ <?= number_format($lucro, 2, ',', '.') ?>
+                </p>
+            </div>
+            <div class="card" style="border-left: 5px solid #8e44ad; padding: 15px; background: #fff; border-radius: 6px;">
+                <h4>Estoque Investido</h4>
+                <p style="font-size: 22px; font-weight: bold; color: #8e44ad;">R$ <?= number_format($total_investido, 2, ',', '.') ?></p>
+            </div>
         </div>
 
-        <!-- Produtos Mais Vendidos -->
-        <div class="card" style="padding: 20px; background: #fff; border-radius: 8px;">
-            <h3>🔥 Top 5 Mais Vendidos</h3>
-            <ul style="list-style: none; padding: 0; margin-top: 15px;">
-                <?php if (mysqli_num_rows($res_produtos) > 0): ?>
-                    <?php while($prod = mysqli_fetch_assoc($res_produtos)): ?>
-                        <li style="padding: 8px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;">
-                            <span><b><?= htmlspecialchars($prod['produto']) ?></b> (<?= $prod['qtd_vendida'] ?>x)</span>
-                            <span style="color: #27ae60;">R$ <?= number_format($prod['total_faturado'], 2, ',', '.') ?></span>
-                        </li>
-                    <?php endwhile; ?>
-                <?php else: ?>
-                    <p style="color: #7f8c8d; font-size: 14px;">Nenhuma venda registrada neste período.</p>
-                <?php endif; ?>
-            </ul>
+        <!-- Grid com Gráfico e Produtos Mais Vendidos -->
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 25px;">
+            <!-- Gráfico -->
+            <div class="card" style="padding: 20px; background: #fff; border-radius: 8px;">
+                <h3>📊 Fluxo Diário do Mês</h3>
+                <canvas id="graficoFinanceiro" style="max-height: 320px;"></canvas>
+            </div>
+
+            <!-- Produtos Mais Vendidos -->
+            <div class="card" style="padding: 20px; background: #fff; border-radius: 8px;">
+                <h3>🔥 Top 5 Mais Vendidos</h3>
+                <ul style="list-style: none; padding: 0; margin-top: 15px;">
+                    <?php if (mysqli_num_rows($res_produtos) > 0): ?>
+                        <?php while($prod = mysqli_fetch_assoc($res_produtos)): ?>
+                            <li style="padding: 8px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;">
+                                <span><b><?= htmlspecialchars($prod['produto']) ?></b> (<?= $prod['qtd_vendida'] ?>x)</span>
+                                <span style="color: #27ae60;">R$ <?= number_format($prod['total_faturado'], 2, ',', '.') ?></span>
+                            </li>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <p style="color: #7f8c8d; font-size: 14px;">Nenhuma venda registrada neste período.</p>
+                    <?php endif; ?>
+                </ul>
+            </div>
         </div>
     </div>
 </main>

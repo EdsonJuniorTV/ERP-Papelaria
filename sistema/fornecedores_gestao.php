@@ -7,8 +7,10 @@ include 'includes/header.php';
 <main>
     <div class="container">
         <div class="header" style="background: #2c3e50;">
-            <h1>🚚 Gestão de Fornecedores</h1>
-            <p>Cadastre as empresas que fornecem seus produtos</p>
+            <div>
+                <h1>🚚 Gestão de Fornecedores</h1>
+                <p>Cadastre as empresas que fornecem seus produtos</p>
+            </div>
         </div>
 
         <form id="form" data-method="post">
