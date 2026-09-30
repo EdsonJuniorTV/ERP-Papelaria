@@ -1,4 +1,4 @@
-<?php include 'includes/header.php'; ?>
+<?php include '../includes/header.php'; ?>
 
 <main>
     <div class="container" style="max-width: 800px;">
@@ -44,7 +44,7 @@
             const tabela = form.dataset.tabela;
             const nome = form.querySelector('input').value;
 
-            const res = await fetch('controllers/api.php', {
+            const res = await fetch('../controllers/api.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ tipo_entidade: 'auxiliar', tabela: tabela, nome: nome })
@@ -57,4 +57,4 @@
     });
 </script>
 
-<?php include 'includes/footer.php'; ?>
+<?php include '../includes/footer.php'; ?>

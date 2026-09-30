@@ -1,8 +1,8 @@
 <?php
-require_once 'includes/auth.php';
-require_once 'config/conexao.php';
+require_once '../includes/auth.php';
+require_once '../config/conexao.php';
 verificarPermissao(['Gerente', 'Programador']);
-include 'includes/header.php';
+include '../includes/header.php';
 
 // Captura o mês e o ano selecionados nos filtros (ou usa o atual por padrão)
 $mes_selecionado = isset($_GET['mes']) ? intval($_GET['mes']) : date('m');
@@ -186,4 +186,4 @@ while ($row = mysqli_fetch_assoc($res_grafico)) {
     });
 </script>
 
-<?php include 'includes/footer.php'; ?>
+<?php include '../includes/footer.php'; ?>

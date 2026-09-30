@@ -1,7 +1,7 @@
 <?php 
-require_once 'includes/auth.php';
-require_once 'config/conexao.php';
-include 'includes/header.php'; 
+require_once '../includes/auth.php';
+require_once '../config/conexao.php';
+include '../includes/header.php'; 
 ?>
 
 <main>
@@ -80,4 +80,4 @@ include 'includes/header.php';
     </div>
 </main>
 
-<?php include 'includes/footer.php'; ?>
+<?php include '../includes/footer.php'; ?>

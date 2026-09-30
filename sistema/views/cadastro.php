@@ -1,6 +1,6 @@
 <?php 
-require_once 'includes/auth.php'; // Garante que só usuários logados acessem
-include 'includes/header.php';    // Traz o Menu e o CSS
+require_once '../includes/auth.php'; // Garante que só usuários logados acessem
+include '../includes/header.php';    // Traz o Menu e o CSS
 ?>
 
 <main>
@@ -87,4 +87,4 @@ include 'includes/header.php';    // Traz o Menu e o CSS
     </div>
 </main>
 
-<?php include 'includes/footer.php'; // Fecha as tags body e html e traz o cadastrar.js ?>
+<?php include '../includes/footer.php'; // Fecha as tags body e html e traz o cadastrar.js ?>

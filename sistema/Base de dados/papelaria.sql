@@ -94,9 +94,11 @@ create table produto(
     nome varchar(150) not null,
     preco decimal(10,2) not null,
     custo decimal(10,2) not null,
+    status enum('Ativo','Inativo') default 'Ativo',
     foreign key (id_forn) references fornecedor(id),
     foreign key (id_cat) references categoria(id),
-    foreign key (id_marca) references marca(id)
+    foreign key (id_marca) references marca(id),
+    index idx_status (status)
 );
 
 -- Histórico de alterações nos produtos
@@ -411,10 +413,5 @@ insert into estoque (id_prod, qtd, qtd_minima) values
 (24, 20, 5),
 (25, 60, 5);
 
-select f.nome, sum(c.valor_comissao) as total_a_pagar
-from comissao c
-join funcionario f on c.id_func = f.id
-group by f.id;
-
 insert into funcionario(id_cargo,id_end,cpf,nome,login,senha,dt_nasc,dt_admissao,fone,email)
-values(1,1,"00000000000","Programador","admin","123","1995-10-10","2010-10-10","00000000000","programador@gmail.com");
+values(1,1,"00000000000","Programador","admin","$2y$10$G9poHdud5XJxgiQq1p0syOMEgE.wNxBwZWoA8ux.KxsnXPf4tDKni","1995-10-10","2010-10-10","00000000000","programador@gmail.com");

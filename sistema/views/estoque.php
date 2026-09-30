@@ -1,7 +1,7 @@
 <?php
 // Fazer uma lógica para falar o id do funcionário atual que está logado no sistema
-require_once 'config/conexao.php';
-require_once 'includes/auth.php';
+require_once '../config/conexao.php';
+require_once '../includes/auth.php';
 
 // ATENÇÃO: Certifique-se de que a sessão já foi iniciada no auth.php
 // Substitua 'id_funcionario' pelo nome da variável de sessão que você usa para guardar o ID do usuário logado.
@@ -10,7 +10,7 @@ $idFuncionario = isset($_SESSION['id_funcionario']) ? intval($_SESSION['id_funci
 // Injeta o ID do funcionário logado no MySQL para que a sua trigger "trg_log_preco_produto" consiga ler
 mysqli_query($conexao, "SET @id_funcionario = $idFuncionario;");
 
-include 'includes/header.php';
+include '../includes/header.php';
 
 if (isset($_GET['delete'])) {
     $id = intval($_GET['delete']);
@@ -412,4 +412,4 @@ function editarProduto(p){
 }
 </script>
 
-<?php include 'includes/footer.php'; ?>
+<?php include '../includes/footer.php'; ?>

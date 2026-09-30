@@ -8,7 +8,7 @@
         exit;
     }
 
-    require_once 'config/conexao.php';
+    require_once '../config/conexao.php';
 
     // -------------------------------------------------------------------------
     // PROCESSAMENTO DA VENDA VIA AJAX (Recebe os dados do JavaScript)
@@ -66,7 +66,7 @@
     $idFuncionario = $_SESSION['user_id'];
     $nomeFuncionario = $_SESSION['user_nome'];
 
-    include 'includes/header.php';
+    include '../includes/header.php';
 
     $filtroNome = isset($_GET['nome']) ? trim($_GET['nome']) : '';
     $filtroFornecedor = isset($_GET['fornecedor']) ? intval($_GET['fornecedor']) : 0;
@@ -113,8 +113,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Caixa</title>
-<link rel="stylesheet" href="public/css/caixa.css">
-<link rel="stylesheet" href="public/css/css.css">
+<link rel="stylesheet" href="/ERP-papelaria/sistema/public/css/caixa.css">
+<link rel="stylesheet" href="/ERP-papelaria/sistema/public/css/css.css">
 </head>
 <body>
     <div class="wrap">
@@ -510,6 +510,6 @@
         }
     </script>
 
-    <?php include 'includes/footer.php'; ?>
+    <?php include '../includes/footer.php'; ?>
 </body>
 </html>

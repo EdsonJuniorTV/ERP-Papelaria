@@ -34,11 +34,12 @@ $nome_usuario = $_SESSION['user_nome'] ?? 'Usuário';
             </div>
             <nav class="nav-menu">
                 <ul>
-                    <li><a href="dashboard.php">📊 Dashboard</a></li>
-                    <li><a href="caixa.php">🛒 Caixa</a></li>
-                    <li><a href="configuracoes.php">⚙ Configurações</a></li>
+                    <!-- Adicionado o caminho absoluto raiz em todos os links -->
+                    <li><a href="/ERP-papelaria/sistema/views/dashboard.php">📊 Dashboard</a></li>
+                    <li><a href="/ERP-papelaria/sistema/views/caixa.php">🛒 Caixa</a></li>
+                    <li><a href="/ERP-papelaria/sistema/views/configuracoes.php">⚙ Configurações</a></li>
                     <li>
-                        <a href="estoque.php">
+                        <a href="/ERP-papelaria/sistema/views/estoque.php">
                             📦 Estoque 
                             <?php if($total_alertas > 0): ?>
                                 <span style="background: red; color: white; padding: 2px 6px; border-radius: 50%; font-size: 10px; font-weight: bold; margin-left: 5px;">
@@ -47,16 +48,17 @@ $nome_usuario = $_SESSION['user_nome'] ?? 'Usuário';
                             <?php endif; ?>
                         </a>
                     </li>
-                    <li><a href="cadastro.php">👥 Clientes</a></li>
-                    <li><a href="fornecedores_gestao.php">🚚 Fornecedores</a></li>
-                    <li><a href="funcionarios_gestao.php">👔 RH</a></li>
-                    <li><a href="cadastrar_produto.php">✏️ Produtos</a></li>
-                    <li><a href="financeiro.php">💵 Financeiro</a></li>
+                    <li><a href="/ERP-papelaria/sistema/views/funcionarios_gestao.php">👔 RH</a></li>
+                    <li><a href="/ERP-papelaria/sistema/views/cadastrar_produto.php">✏️ Produtos</a></li>
+                    <li><a href="/ERP-papelaria/sistema/views/financeiro.php">💵 Financeiro</a></li>
+                    <li><a href="/ERP-papelaria/sistema/views/fornecedor_gestao.php">🚚 Fornecedores</a></li>
+                    <li><a href="/ERP-papelaria/sistema/views/cliente_gestao.php">👥 Clientes</a></li>
                 </ul>
             </nav>
             <div class="user-info">
                 <span class="user-name">👋 <?= htmlspecialchars($nome_usuario) ?></span>
-                <button class="logout-btn" onclick="location.href='logout.php'">🚪 Sair</button>
+                <!-- O logout também precisa do caminho absoluto caso seja clicado estando dentro da pasta views -->
+                <button class="logout-btn" onclick="location.href='/ERP-papelaria/sistema/views/logout.php'">🚪 Sair</button>
             </div>
         </div>
     </header>

@@ -64,6 +64,14 @@ try {
                     $resposta = editarFuncionario($input, $conexao);
                     break;
 
+                case 'editar_cliente':
+                    $resposta = editarCliente($input, $conexao);
+                    break;
+
+                case 'editar_fornecedor':
+                    $resposta = editarFornecedor($input, $conexao);
+                    break; 
+
                 default:
                     $resposta = ["status" => false, "mensagem" => "Tipo de entidade desconhecido: $tipo"];
             }
@@ -90,7 +98,16 @@ try {
                 $resposta = ["status" => false, "mensagem" => "ID não informado para exclusão."];
                 break;
             }
-            $resposta = excluirFuncionario((int)$input['id'], $conexao);
+            
+            $tipo = $input['tipo_entidade'] ?? '';
+            
+            if ($tipo === 'cliente') {
+                $resposta = excluirCliente((int)$input['id'], $conexao);
+            } elseif ($tipo === 'fornecedor') {
+                $resposta = excluirFornecedor((int)$input['id'], $conexao);
+            } else {
+                $resposta = excluirFuncionario((int)$input['id'], $conexao);
+            }
             break;
 
         case 'GET':

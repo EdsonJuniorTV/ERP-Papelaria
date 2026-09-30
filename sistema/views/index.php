@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ERP-Papelaria</title>
-    <link rel="stylesheet" href="public/css/css.css">
+    <link rel="stylesheet" href="/ERP-papelaria/sistema/public/css/css.css">
     <style>
         body { background: var(--bg); }
 
@@ -163,7 +163,7 @@
 
 </div>
 
-<?php include 'includes/footer.php'; ?>
+<?php include '../includes/footer.php'; ?>
 
 <script>
     const urlParams = new URLSearchParams(window.location.search);

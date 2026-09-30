@@ -1,6 +1,6 @@
 <?php
-require_once 'includes/auth.php';
-include 'includes/header.php';
+require_once '../includes/auth.php';
+include '../includes/header.php';
 $cargo = $_SESSION['user_cargo'];
 ?>
 
@@ -68,4 +68,4 @@ $cargo = $_SESSION['user_cargo'];
     </div>
 </main>
 
-<?php include 'includes/footer.php'; ?>
+<?php include '../includes/footer.php'; ?>

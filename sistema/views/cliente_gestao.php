@@ -5,18 +5,16 @@
     include '../includes/header.php';
 
     $todosClientes = listarClientes($conexao);
-    // Adicionar funcionalidade aos botões
-    // Criar um caminho para esse arquivo no header
 ?>
 
 <main>
     <div class="container">
         <div class="header">
             <div>
-                <h1>Gestão de Clientes</h1>
+                <h1>👥Gestão de Clientes</h1>
                 <p>Veja, adicione, altere ou remova clientes</p>
             </div>
-            <button class="btn-success">
+            <button class="btn-success" onclick="abrirModalCliente()">
                 ADICIONAR
             </button>
         </div>
@@ -37,7 +35,7 @@
                 <tbody>
                     <?php if (empty($todosClientes)): ?>
                         <tr>
-                            <td>Nenhum cliente encontrado.</td>
+                            <td colspan="8">Nenhum cliente encontrado.</td>
                         </tr>
                     <?php else: ?>
                         <?php foreach ($todosClientes as $tc): ?>
@@ -50,8 +48,8 @@
                                 <td><?= htmlspecialchars($tc['cidade'] ?? '-') ?></td>
                                 <td><?= htmlspecialchars($tc['estado'] ?? '-') ?></td>
                                 <td>
-                                    <button class="btn-submit">EDITAR</button>
-                                    <button class="btn-danger">REMOVER</button>
+                                    <button class="btn-submit" onclick='abrirEdicaoCliente(<?= json_encode($tc) ?>)'>EDITAR</button>
+                                    <button class="btn-danger" onclick="removerCliente(<?= $tc['id'] ?>, '<?= htmlspecialchars(addslashes($tc['nome'])) ?>')">REMOVER</button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -61,5 +59,8 @@
         </div>
     </div>
 </main>
+
+<?php include '../includes/modal_cliente.php'; ?>
+<script src="../public/js/gestao.js"></script>
 
 <?php include '../includes/footer.php'; ?>
