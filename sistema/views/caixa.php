@@ -198,7 +198,7 @@
                 <h2>Comanda <span id="num-comanda"></span></h2>
                 <div id="lista-comanda"></div>
                 <div>Total: <b id="total1">R$ 0,00</b></div>
-                <button class="btn ok" onclick="irTela2()">Finalizar Pedido</button>
+                <button class="btn-success" onclick="irTela2()">Finalizar Pedido</button>
             </div>
 
         </div>
@@ -252,7 +252,7 @@
 
                 <div id="msg" style="color: red; font-weight: bold; margin-top: 10px;"></div>
                 
-                <button id="btn-finalizar" class="btn ok" onclick="finalizar()">Finalizar Venda</button>
+                <button id="btn-finalizar" class="btn-success" onclick="finalizar()">Finalizar Venda</button>
                 <button class="btn" style="background:#ccc; color:#333;" onclick="voltarTela1()">Voltar</button>
             </div>
         </div>

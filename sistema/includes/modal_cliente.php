@@ -89,7 +89,7 @@
                 Cancelar
             </button>
             <button type="submit" class="btn-submit" style="margin:0;">
-                💾 Salvar Cliente
+                Salvar Cliente
             </button>
         </div>
     </form>

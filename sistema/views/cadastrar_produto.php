@@ -72,7 +72,7 @@ $marcas       = mysqli_query($conexao, "SELECT id, nome FROM marca ORDER BY nome
             </div>
 
             <div style="margin-top: 20px;">
-                <button type="submit" class="btn-submit">💾 Cadastrar Produto</button>
+                <button type="submit" class="btn-submit">Cadastrar Produto</button>
                 <button type="reset" class="btn-submit" style="background: #95a5a6; margin-left: 10px;">Limpar</button>
             </div>
         </form>

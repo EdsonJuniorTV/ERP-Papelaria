@@ -106,7 +106,7 @@
                 Cancelar
             </button>
             <button type="submit" class="btn-submit" id="btn-salvar" style="margin:0;">
-                💾 Salvar Funcionário
+                Salvar Funcionário
             </button>
         </div>
     </form>

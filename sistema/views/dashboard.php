@@ -18,7 +18,7 @@ $cargo = $_SESSION['user_cargo'];
             <p>Realizar vendas e emitir pedidos</p>
         </div>
 
-        <div class="card" onclick="location.href='cadastro.php'" style="cursor:pointer; background: #1abc9c; color: white; padding: 30px; border-radius: 10px; text-align: center;">
+        <div class="card" onclick="location.href='cliente_gestao.php'" style="cursor:pointer; background: #1abc9c; color: white; padding: 30px; border-radius: 10px; text-align: center;">
             <div style="font-size: 40px; margin-bottom: 10px;">👥</div>
             <h3>Novo Cliente</h3>
             <p>Cadastrar clientes no sistema</p>
@@ -36,7 +36,7 @@ $cargo = $_SESSION['user_cargo'];
             <p>Categorias, Marcas e Cargos</p>
         </div>
 
-        <div class="card" onclick="location.href='fornecedores_gestao.php'" style="cursor:pointer; background: #15929b; color: white; padding: 30px; border-radius: 10px; text-align: center;">
+        <div class="card" onclick="location.href='fornecedor_gestao.php'" style="cursor:pointer; background: #15929b; color: white; padding: 30px; border-radius: 10px; text-align: center;">
             <div style="font-size: 40px; margin-bottom: 10px;">🚚</div>
             <h3>Gestão de fornecedores</h3>
             <p>Cadastragem de fornecedores</p>

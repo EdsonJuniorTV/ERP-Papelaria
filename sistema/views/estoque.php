@@ -314,7 +314,7 @@ $total_pages = ceil($total / $limit);
 
     <input type="number" name="qtd_entrada" placeholder="Quantidade a adicionar" required>
 
-    <button type="submit" name="entrada_mercadoria">Registrar Entrada</button>
+    <button type="submit" class="btn-submit" name="entrada_mercadoria">Registrar Entrada</button>
 
 </form>
 
@@ -357,9 +357,8 @@ $total_pages = ceil($total / $limit);
     </td>
 
     <td>
-        <a href="?delete=<?=$i['id']?>" onclick="return confirm('Excluir?')" style="color:red;">Excluir</a>
-        |
-        <a href="javascript:void(0)" onclick='editarProduto(<?=json_encode($i)?>)' style="color:blue;">Editar</a>
+        <a href="?delete=<?=$i['id']?>" onclick="return confirm('Excluir?')" class="btn-danger" style="text-decoration: none">Excluir</a>
+        <a href="javascript:void(0)" onclick='editarProduto(<?=json_encode($i)?>)' class="btn-submit" style="text-decoration: none">Editar</a>
     </td>
 
 </tr>

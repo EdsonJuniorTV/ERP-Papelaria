@@ -79,7 +79,7 @@
                 Cancelar
             </button>
             <button type="submit" class="btn-submit" style="margin:0;">
-                💾 Salvar Fornecedor
+                 Salvar Fornecedor
             </button>
         </div>
     </form>

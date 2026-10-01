@@ -30,8 +30,7 @@ $funcionarios = listarFuncionarios($conexao, $usuarioLogadoId);
                 <h1>👔 Gestão de Funcionários</h1>
                 <p style="color:rgba(255,255,255,.75); margin:0;">Cadastre, edite e gerencie os colaboradores</p>
             </div>
-            <button onclick="abrirModal()" 
-                    style="background:white; color:#8e44ad; border:none; padding:10px 20px; border-radius:8px; font-weight:700; cursor:pointer; font-size:.9rem;">
+            <button onclick="abrirModal()" class="btn-success">
                 + Novo Funcionário
             </button>
         </div>
@@ -68,30 +67,26 @@ $funcionarios = listarFuncionarios($conexao, $usuarioLogadoId);
                                 <td style="padding:13px 16px; color:#6b7280; font-size:.88rem;"><?= htmlspecialchars($f['fone']) ?></td>
                                 <td style="padding:13px 16px;">
                                     <?php if ($f['status'] === 'Ativo'): ?>
-                                        <span style="background:#d1fae5; color:#065f46; padding:3px 10px; border-radius:20px; font-size:.8rem; font-weight:600;">✔ Ativo</span>
+                                        <span style="background:#d1fae5; color:#065f46; padding:3px 10px; border-radius:20px; font-size:.8rem; font-weight:600;"> Ativo</span>
                                     <?php else: ?>
-                                        <span style="background:#fde8e8; color:#9b1c1c; padding:3px 10px; border-radius:20px; font-size:.8rem; font-weight:600;">✖ Inativo</span>
+                                        <span style="background:#fde8e8; color:#9b1c1c; padding:3px 10px; border-radius:20px; font-size:.8rem; font-weight:600;"> Inativo</span>
                                     <?php endif; ?>
                                 </td>
                                 <td style="padding:13px 16px; display:flex; gap:4px; flex-wrap:wrap;">
-                                    <button onclick='abrirEdicao(<?= json_encode($f) ?>)'
-                                            style="background:#1a56db; color:#fff; border:none; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:.83rem; font-weight:600;">
-                                        ✏️ Editar
+                                    <button onclick='abrirEdicao(<?= json_encode($f) ?>)' class="btn-submit">
+                                         Editar
                                     </button>
                                     <?php if ($f['status'] === 'Ativo'): ?>
-                                        <button onclick="confirmarExclusao(<?= $f['id'] ?>, '<?= htmlspecialchars(addslashes($f['nome'])) ?>')"
-                                                style="background:#e02424; color:#fff; border:none; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:.83rem; font-weight:600;">
-                                            🔒 Desativar
+                                        <button onclick="confirmarExclusao(<?= $f['id'] ?>, '<?= htmlspecialchars(addslashes($f['nome'])) ?>')" class="btn-danger">
+                                             Desativar
                                         </button>
                                     <?php else: ?>
-                                        <button onclick="reativarFuncionario(<?= $f['id'] ?>, '<?= htmlspecialchars(addslashes($f['nome'])) ?>')" 
-                                                style="background:#228B22; color:#fff; border:none; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:.83rem; font-weight:600;">
-                                            🔓 Reativar
+                                        <button onclick="reativarFuncionario(<?= $f['id'] ?>, '<?= htmlspecialchars(addslashes($f['nome'])) ?>')" class="btn-success">
+                                             Reativar
                                         </button>
                                     <?php endif; ?>
-                                    <button onclick="removerFuncionario(<?= $f['id'] ?>, '<?= htmlspecialchars(addslashes($f['nome'])) ?>')"
-                                            style="background:#1C1C1C; color:#fff; border:none; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:.83rem; font-weight:600;">
-                                        🗑 Remover
+                                    <button onclick="removerFuncionario(<?= $f['id'] ?>, '<?= htmlspecialchars(addslashes($f['nome'])) ?>')" class="btn-submit" style="background-color: #000000">
+                                        Remover
                                     </button>
                                 </td>
                             </tr>
