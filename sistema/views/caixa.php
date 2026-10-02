@@ -60,8 +60,11 @@
 <link rel="stylesheet" href="/ERP-papelaria/sistema/public/css/css.css">
 </head>
 <body>
-    <div class="wrap">
-        <h1>Caixa</h1>
+    <div class="wrap" style="max-width: 1300px;">
+        <div style="background-color: #1a56db; color: #ffffff; padding: 22px 28px; border-radius: 10px; 
+        display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h1 style="color: #ffffff; margin: 0; font-size: 1.3rem;">Caixa</h1>
+        </div>
 
         <!-- TELA 1: Seleção de Produtos -->
         <div id="tela1" class="grid">
@@ -70,27 +73,30 @@
                 <h2>Produtos</h2>
 
                 <form method="GET">
-                    <label>Buscar Pelo Nome do Produto</label>
-                    <input type="text" name="nome" placeholder="Ex: Nome do produto."
-                    value="<?= htmlspecialchars($filtroNome)?>">
-
-                    <select name="fornecedor">
-                        <option value="0">Todas os Fornecedores</option>
-                        <?php foreach($fornecedores as$f): ?>
-                            <option value="<?= $f['id']?>" <?= ($filtroFornecedor ==$f['id']) ? 'selected' : '' ?>>
-                                <?= $f['nome']?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-
-                    <select name="marca">
-                        <option value="0">Todas as Marcas</option>
-                        <?php foreach($marcas as$m): ?>
-                            <option value="<?= $m['id']?>" <?= ($filtroMarca ==$m['id']) ? 'selected' : '' ?>>
-                                <?= $m['nome']?>
-                            </option>
-                        <?php endforeach;?>
-                    </select>
+                    <div style="padding: 10px">
+                        <label>Buscar Pelo Nome do Produto</label>
+                        <input type="text" name="nome" placeholder="Ex: Nome do produto." value="<?= htmlspecialchars($filtroNome)?>">
+                    </div>
+                    <div style="padding: 10px">
+                        <select name="fornecedor">
+                            <option value="0">Todas os Fornecedores</option>
+                            <?php foreach($fornecedores as$f): ?>
+                                <option value="<?= $f['id']?>" <?= ($filtroFornecedor ==$f['id']) ? 'selected' : '' ?>>
+                                    <?= $f['nome']?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div style="padding: 10px">
+                        <select name="marca">
+                            <option value="0">Todas as Marcas</option>
+                            <?php foreach($marcas as$m): ?>
+                                <option value="<?= $m['id']?>" <?= ($filtroMarca ==$m['id']) ? 'selected' : '' ?>>
+                                    <?= $m['nome']?>
+                                </option>
+                            <?php endforeach;?>
+                        </select>
+                    </div>
 
                     <button type="submit">Filtrar</button>
                 </form>
@@ -103,12 +109,13 @@
                         <div>Fornecedor</div>
                         <div>Preço</div>
                         <div>Estoque</div>
-                        <div></div>
+                        <div>Ações</div>
                     </div>
 
-                    <div class="tbody">
+                    <div class="tbody" style="max-height: 350px; overflow-y: auto;">
                         <?php while($p = mysqli_fetch_assoc($produtos)) { ?>
-                            <div class="tr">
+                            <div class="tr" style="display: grid; grid-template-columns: 60px 2.5fr 1.2fr 2fr 100px 80px 50px; 
+                            align-items: center; padding: 12px 16px; border-bottom: 1px solid #e2e8f0; gap: 15px;">
                                 <div><?php echo $p['id']; ?></div>
                                 <div><?php echo $p['nome']; ?></div>
                                 <div><?php echo $p['marca']; ?></div>
@@ -118,18 +125,22 @@
                                     <?php echo $p['qtd']; ?>
                                 </div>
                                 <div>
-                                    <button class="botaoAdd" 
-                                    onclick="addCarrinho(
-                                    '<?php echo $p['id']; ?>',
-                                    '<?php echo addslashes($p['nome']); ?>',
-                                    <?php echo $p['preco']; ?>,
-                                    <?php echo $p['custo']; ?>)">
-                                        +
-                                    </button>
-                                    <button class="botaoAdd"
-                                    onclick="removerCarrinho('<?php echo $p['id']; ?>')">
-                                        -
-                                    </button>
+                                    <div style="padding: 2px">
+                                        <button class="botaoAdd" 
+                                        onclick="addCarrinho(
+                                        '<?php echo $p['id']; ?>',
+                                        '<?php echo addslashes($p['nome']); ?>',
+                                        <?php echo $p['preco']; ?>,
+                                        <?php echo $p['custo']; ?>)">
+                                            +
+                                        </button>
+                                    </div>
+                                    <div style="padding: 2px">
+                                        <button class="botaoAdd"
+                                        onclick="removerCarrinho('<?php echo $p['id']; ?>')">
+                                            -
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         <?php } ?>
