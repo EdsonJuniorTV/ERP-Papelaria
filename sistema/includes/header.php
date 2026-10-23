@@ -59,7 +59,9 @@ $cargo = $_SESSION['user_cargo']
                         <li><a href="/ERP-papelaria/sistema/views/funcionarios_gestao.php">👔 RH</a></li>
                         <li><a href="/ERP-papelaria/sistema/views/financeiro.php">💵 Financeiro</a></li>
                     <?php endif; ?>
-                    <li><a href="/ERP-papelaria/sistema/views/configuracoes.php">⚙ Configurações</a></li>
+                    <?php if($cargo == "Repositor" || $cargo == "Gerente"): ?>
+                        <li><a href="/ERP-papelaria/sistema/views/configuracoes.php">⚙ Configurações</a></li>
+                    <?php endif; ?>
                 </ul>
             </nav>
             <div class="user-info">

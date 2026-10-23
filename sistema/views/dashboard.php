@@ -59,12 +59,14 @@ $cargo = $_SESSION['user_cargo'];
                 <p>Vendas, Compras e saldo líquido</p>
             </div>
         <?php endif; ?>
-
-        <div class="card" onclick="location.href='configuracoes.php'" style="cursor:pointer; background: #7f8c8d; color: white; padding: 30px; border-radius: 10px; text-align: center;">
-            <div style="font-size: 40px; margin-bottom: 10px;">⚙️</div>
-            <h3>Configurações</h3>
-            <p>Categorias, Marcas e Cargos</p>
-        </div>
+        
+        <?php if($cargo == "Repositor" || $cargo == "Gerente"): ?>
+            <div class="card" onclick="location.href='configuracoes.php'" style="cursor:pointer; background: #7f8c8d; color: white; padding: 30px; border-radius: 10px; text-align: center;">
+                <div style="font-size: 40px; margin-bottom: 10px;">⚙️</div>
+                <h3>Configurações</h3>
+                <p>Categorias, Marcas e Cargos</p>
+            </div>
+        <?php endif; ?>
 
     </div>
 </main>

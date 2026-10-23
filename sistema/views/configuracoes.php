@@ -1,4 +1,7 @@
-<?php include '../includes/header.php'; ?>
+<?php 
+    include '../includes/header.php'; 
+    $cargo = $_SESSION['user_cargo'];
+?>
 
 <main>
     <div class="container" style="max-width: 800px;">
@@ -25,13 +28,15 @@
                 </form>
             </section>
 
-            <section>
-                <h3>👔 Cargos</h3>
-                <form class="form-rapido" data-tabela="cargo">
-                    <input type="text" placeholder="Novo Cargo..." required>
-                    <button type="submit" style="background: #3498db; color:white; border:none; padding:5px 10px; cursor:pointer;">+</button>
-                </form>
-            </section>
+            <?php if($cargo == "Gerente"): ?>
+                <section>
+                    <h3>👔 Cargos</h3>
+                    <form class="form-rapido" data-tabela="cargo">
+                        <input type="text" placeholder="Novo Cargo..." required>
+                        <button type="submit" style="background: #3498db; color:white; border:none; padding:5px 10px; cursor:pointer;">+</button>
+                    </form>
+                </section>
+            <?php endif; ?>
         </div>
     </div>
 </main>
