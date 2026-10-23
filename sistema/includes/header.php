@@ -43,7 +43,6 @@ $cargo = $_SESSION['user_cargo']
                     <?php endif; ?>
                     <?php if($cargo == "Repositor" || $cargo == "Gerente"): ?>
                         <li><a href="/ERP-papelaria/sistema/views/fornecedor_gestao.php">🚚 Fornecedores</a></li>
-                        <li><a href="/ERP-papelaria/sistema/views/cadastrar_produto.php">✏️ Produtos</a></li>
                         <li>
                             <a href="/ERP-papelaria/sistema/views/estoque.php">
                                 📦 Estoque 
@@ -56,7 +55,7 @@ $cargo = $_SESSION['user_cargo']
                         </li>
                     <?php endif; ?>
                     <?php if($cargo == "Gerente"): ?>
-                        <li><a href="/ERP-papelaria/sistema/views/funcionarios_gestao.php">👔 RH</a></li>
+                        <li><a href="/ERP-papelaria/sistema/views/funcionarios_gestao.php">👔 Funcionários</a></li>
                         <li><a href="/ERP-papelaria/sistema/views/financeiro.php">💵 Financeiro</a></li>
                     <?php endif; ?>
                     <?php if($cargo == "Repositor" || $cargo == "Gerente"): ?>

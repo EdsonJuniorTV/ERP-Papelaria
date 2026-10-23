@@ -27,11 +27,6 @@ $cargo = $_SESSION['user_cargo'];
         <?php endif; ?>
 
         <?php if($cargo == "Repositor" || $cargo == "Gerente"): ?>
-            <div class="card" onclick="location.href='cadastrar_produto.php'" style="cursor:pointer; background: #b8670a; color: white; padding: 30px; border-radius: 10px; text-align: center;">
-                <div style="font-size: 40px; margin-bottom: 10px;">✏️</div>
-                <h3>Cadastro de Produtos</h3>
-                <p>Adicionar novos produtos ao estoque</p>
-            </div>
 
             <div class="card" onclick="location.href='fornecedor_gestao.php'" style="cursor:pointer; background: #15929b; color: white; padding: 30px; border-radius: 10px; text-align: center;">
                 <div style="font-size: 40px; margin-bottom: 10px;">🚚</div>
