@@ -19,7 +19,7 @@ $usuarioLogadoId = (int) $_SESSION['user_id'];
 
 // Consultas via funções e modelo
 $cargos = mysqli_query($conexao, "SELECT * FROM cargo ORDER BY nome ASC");
-$funcionarios = listarFuncionarios($conexao, $usuarioLogadoId);
+$funcionarios = listarFuncionarios($conexao);
 ?>
 
 <main>
@@ -78,18 +78,20 @@ $funcionarios = listarFuncionarios($conexao, $usuarioLogadoId);
                                     <button onclick='abrirEdicao(<?= json_encode($f) ?>)' class="btn-submit">
                                          Editar
                                     </button>
-                                    <?php if ($f['status'] === 'Ativo'): ?>
-                                        <button onclick="confirmarExclusao(<?= $f['id'] ?>, '<?= htmlspecialchars(addslashes($f['nome'])) ?>')" class="btn-danger">
-                                             Desativar
-                                        </button>
-                                    <?php else: ?>
-                                        <button onclick="reativarFuncionario(<?= $f['id'] ?>, '<?= htmlspecialchars(addslashes($f['nome'])) ?>')" class="btn-success">
-                                             Reativar
+                                    <?php if($f['id'] != $usuarioLogadoId): ?>
+                                        <?php if ($f['status'] === 'Ativo'): ?>
+                                            <button onclick="confirmarExclusao(<?= $f['id'] ?>, '<?= htmlspecialchars(addslashes($f['nome'])) ?>')" class="btn-danger">
+                                                Desativar
+                                            </button>
+                                        <?php else: ?>
+                                            <button onclick="reativarFuncionario(<?= $f['id'] ?>, '<?= htmlspecialchars(addslashes($f['nome'])) ?>')" class="btn-success">
+                                                Reativar
+                                            </button>
+                                        <?php endif; ?>
+                                        <button onclick="removerFuncionario(<?= $f['id'] ?>, '<?= htmlspecialchars(addslashes($f['nome'])) ?>')" class="btn-submit" style="background-color: #000000">
+                                            Remover
                                         </button>
                                     <?php endif; ?>
-                                    <button onclick="removerFuncionario(<?= $f['id'] ?>, '<?= htmlspecialchars(addslashes($f['nome'])) ?>')" class="btn-submit" style="background-color: #000000">
-                                        Remover
-                                    </button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

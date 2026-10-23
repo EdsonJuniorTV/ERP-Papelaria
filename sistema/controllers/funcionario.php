@@ -56,7 +56,7 @@
     /**
      * Consulta todos os funcionários trazendo o nome do cargo e dados do endereço
      */
-    function listarFuncionarios($conn, $idExcluirLogado = null) {
+    function listarFuncionarios($conn) {
         $sql = "
             SELECT f.*, c.nome AS cargo, 
                 e.logradouro, e.cidade, e.estado
@@ -64,10 +64,6 @@
             JOIN cargo c ON f.id_cargo = c.id
             LEFT JOIN endereco e ON f.id_end = e.id
         ";
-        
-        if ($idExcluirLogado !== null) {
-            $sql .= " WHERE f.id <> " . (int)$idExcluirLogado;
-        }
         
         $sql .= " ORDER BY f.nome ASC";
 
@@ -99,9 +95,9 @@
             $conn->begin_transaction();
 
             // 1. Atualiza dados principais
-            $sqlFunc = "UPDATE funcionario SET id_cargo = ?, nome = ?, login = ?, fone = ?, email = ? WHERE id = ?";
+            $sqlFunc = "UPDATE funcionario SET id_cargo = ?, nome = ?, cpf = ?, login = ?, dt_nasc = ?, dt_admissao = ?, fone = ?, email = ? WHERE id = ?";
             $stmtFunc = $conn->prepare($sqlFunc);
-            $stmtFunc->bind_param("issssi", $data['id_cargo'], $data['nome'], $data['login'], $data['fone'], $data['email'], $data['id']);
+            $stmtFunc->bind_param("isssssssi", $data['id_cargo'], $data['nome'], $data['cpf'], $data['login'], $data['dt_nasc'], $data['dt_admissao'], $data['fone'], $data['email'], $data['id']);
             $stmtFunc->execute();
 
             // Atualização opcional de senha (Só atualiza se o usuário digitou algo novo)
