@@ -12,7 +12,7 @@ $marcas       = mysqli_query($conexao, "SELECT id, nome FROM marca ORDER BY nome
 <main>
     <div class="container">
         <div class="header" style="background: #e67e22;">
-            <h1>📦 Novo Produto</h1>
+            <h1>✏️ Novo Produto</h1>
             <p>Cadastre itens no catálogo e defina margens de lucro</p>
         </div>
 

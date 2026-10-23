@@ -35,6 +35,9 @@
   --shadow:      0 4px 12px rgba(0,0,0,.08);
   --shadow-lg:   0 10px 30px rgba(0,0,0,.12);
 
+  /* Mesmo degradê do topo do index.php */
+  --gradient-brand: linear-gradient(135deg, #0f172a 0%, #1a56db 100%);
+
   --sidebar-w:   240px;
   --header-h:    64px;
 
@@ -75,7 +78,7 @@ main { flex: 1; padding: 28px 32px; }
 
 /* ── Navbar horizontal ─────────────────────────────────────── */
 .top-header {
-  background: #0f172a;
+  background: var(--gradient-brand);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -117,7 +120,7 @@ main { flex: 1; padding: 28px 32px; }
   gap: 5px;
   padding: 7px 13px;
   border-radius: 7px;
-  color: #94a3b8;
+  color: rgba(255,255,255,.78);
   font-size: .83rem;
   font-weight: 500;
   white-space: nowrap;
@@ -125,7 +128,7 @@ main { flex: 1; padding: 28px 32px; }
   text-decoration: none;
 }
 .nav-menu ul li a:hover {
-  background: rgba(255,255,255,.08);
+  background: rgba(255,255,255,.14);
   color: #fff;
 }
 .nav-menu ul li a.active {
@@ -153,14 +156,14 @@ main { flex: 1; padding: 28px 32px; }
 }
 .user-name {
   font-size: .83rem;
-  color: #94a3b8;
+  color: rgba(255,255,255,.85);
 }
 .logout-btn {
   padding: 6px 13px;
   background: transparent;
-  border: 1.5px solid #334155;
+  border: 1.5px solid rgba(255,255,255,.35);
   border-radius: 7px;
-  color: #94a3b8;
+  color: rgba(255,255,255,.85);
   font-size: .8rem;
   font-family: var(--font-sans);
   cursor: pointer;

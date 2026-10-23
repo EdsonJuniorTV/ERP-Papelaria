@@ -15,7 +15,7 @@
                 <p>Veja, adicione, altere ou remova clientes</p>
             </div>
             <button class="btn-success" onclick="abrirModalCliente()">
-                ADICIONAR
+                + ADICIONAR
             </button>
         </div>
         <div>

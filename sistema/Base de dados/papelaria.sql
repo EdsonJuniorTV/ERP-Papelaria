@@ -23,7 +23,7 @@ create table endereco(
     logradouro varchar(200) not null,
     cidade varchar(100) not null,
     estado char(2) not null,
-    cep char(8) not null
+    cep char(9) not null
 );
 
 -- 3. Tabelas de Entidades (Pessoas e Empresas)
@@ -31,7 +31,7 @@ create table funcionario(
     id int primary key auto_increment,
     id_cargo int not null,
     id_end int not null,
-    cpf char(11) not null unique,
+    cpf char(14) not null unique,
     nome varchar(80) not null,
     login varchar(50) not null unique, -- Adicionado para o sistema
     senha varchar(255) not null,       -- Adicionado para o sistema
@@ -66,7 +66,7 @@ create table folha_pagamento (
 
 create table cliente(
     id int primary key auto_increment,
-    cpf char(11) not null unique,
+    cpf char(14) not null unique,
     id_end int not null,
     nome varchar(80) not null,
     dt_nasc date not null,
@@ -78,7 +78,7 @@ create table cliente(
 create table fornecedor(
     id int primary key auto_increment,
     nome varchar(80) not null,
-    cnpj char(14) not null unique,
+    cnpj char(18) not null unique,
     fone varchar(20) not null,
     email varchar(120) not null,
     id_end int,
@@ -255,6 +255,11 @@ begin
         insert into historico_produto (id_prod, id_func, campo_alterado, valor_antigo, valor_novo)
         values (OLD.id, v_id_func, 'nome', OLD.nome, NEW.nome);
     end if;
+
+    if OLD.status <> NEW.status then
+        insert into historico_produto (id_prod, id_func, campo_alterado, valor_antigo, valor_novo)
+        values (OLD.id, v_id_func, 'status', OLD.status, NEW.status);
+    end if;
 end; //
 
 create trigger trg_log_status_funcionario
@@ -289,22 +294,32 @@ BEFORE INSERT ON item_pedido
 FOR EACH ROW
 BEGIN
     DECLARE estoque_atual INT;
+    DECLARE status_prod VARCHAR(10);
+
+    -- Produto desativado não pode ser vendido
+    SELECT status INTO status_prod FROM produto WHERE id = NEW.id_prod;
+    IF status_prod = 'Inativo' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'ERRO: Produto inativo não pode ser vendido!';
+    END IF;
 
     -- Busca a quantidade atual no estoque
     SELECT qtd INTO estoque_atual FROM estoque WHERE id_prod = NEW.id_prod;
 
-    -- Se a quantidade for insuficiente, cancela a operação com um erro personalizado
-    IF estoque_atual < NEW.qtd THEN
+    -- Sem linha de estoque (NULL) ou quantidade insuficiente: cancela a operação
+    IF estoque_atual IS NULL OR estoque_atual < NEW.qtd THEN
         SIGNAL SQLSTATE '45000' 
         SET MESSAGE_TEXT = 'ERRO: Estoque insuficiente para este produto!';
     END IF;
 END; //
-
 delimiter ;
 
 -- 7. Dados Iniciais para Teste
-insert into endereco(logradouro, cidade, estado, cep) values ('Parque Jardim Europa','Bauru','SP','17017050');
-insert into cargo(nome) values ('Gerente'), ('Vendedor');
+insert into endereco(logradouro, cidade, estado, cep) 
+values ('Parque Jardim Europa, 6-80, lado par','Bauru','SP','17017-050'),
+('Alameda Gabriel Monteiro da Silva, 6-20, lado ímpar','Bauru','SP','01441-002'),
+('Avenida Angélica, 9-20, lado par','Bauru','SP','01228-000');
+insert into cargo(nome) values ('Gerente'), ('Vendedor'), ('Repositor');
 
 insert into categoria(nome) 
 values ('Escrita'),
@@ -346,13 +361,13 @@ values  ('Bic'),
         ('Elgin');
 
 insert into fornecedor(nome, cnpj, fone, email, id_end) 
-values  ('Distribuidora Central', '12345678000199', '1499999999', 'contato@dist.com', 1),
-        ('Comercial Horizonte', '11111111000111', '14911111111', 'alpha@gmail.com', 1),
-        ('Atlas Distribuição', '22222222000122', '14922222222', 'beta@gmail.com', 1),
-        ('Imperial Distribuidora', '33333333000133', '14933333333', 'gama@gmail.com', 1),
-        ('Integra Distribuidora', '44444444000144', '14944444444', 'delta@gmail.com', 1),
-        ('Capital Distribuidora', '55555555000155', '14955555555', 'omega@gmail.com', 1),
-        ('Delta Fornecimentos', '66666666000166', '14966666666', 'prime@gmail.com', 1);
+values  ('Distribuidora Central', '12.345.678/0001-99', '(14) 99999-9999', 'contato@dist.com', 1),
+        ('Comercial Horizonte', '11.111.111/0001-11', '(14) 91111-1111', 'alpha@gmail.com', 2),
+        ('Atlas Distribuição', '22.222.222/0001-22', '(14) 92222-2222', 'beta@gmail.com', 1),
+        ('Imperial Distribuidora', '33.333.333/0001-33', '(14) 93333-3333', 'gama@gmail.com', 3),
+        ('Integra Distribuidora', '44.444.444/0001-44', '(14) 94444-4444', 'delta@gmail.com', 3),
+        ('Capital Distribuidora', '55.555.555/0001-55', '(14) 95555-5555', 'omega@gmail.com', 1),
+        ('Delta Fornecimentos', '66.666.666/0001-66', '(14) 96666-6666', 'prime@gmail.com', 2);
 
 -- Ao inserir este produto, o estoque será criado automaticamente pelo trigger
 insert into produto
@@ -414,4 +429,9 @@ insert into estoque (id_prod, qtd, qtd_minima) values
 (25, 60, 5);
 
 insert into funcionario(id_cargo,id_end,cpf,nome,login,senha,dt_nasc,dt_admissao,fone,email)
-values(1,1,"00000000000","Programador","admin","$2y$10$G9poHdud5XJxgiQq1p0syOMEgE.wNxBwZWoA8ux.KxsnXPf4tDKni","1995-10-10","2010-10-10","00000000000","programador@gmail.com");
+values(1,1,"000.000.000-00","Programador","admin","$2y$10$G9poHdud5XJxgiQq1p0syOMEgE.wNxBwZWoA8ux.KxsnXPf4tDKni","1995-10-10","2010-10-10","(00) 00000-0000","programador@gmail.com"), -- 123
+(2,2,"111.111.111-11","Marcos Almeida","MarcosAlmeida","$2y$10$Idk7meRz4qORBjEpppftc.TnUwJa5d4fODe3yqySRhAFXsLgivOTK","1992-05-04","2017-08-04","(14) 85756-9484","marcos@gmail.com"), -- aranha
+(3,3,"222.222.222-22","Maria Madeira","mary","$2y$10$ZkhyPvE3ynT1Gh3DFnaHMe/8kpLHTuo.RWpUvix8jiqfY5DTmnNa.","1998-07-14","2019-06-27","(14) 82634-7363","mary@gmail.com"); -- bolo
+
+INSERT INTO cliente(cpf,id_end,nome,dt_nasc,fone,email)
+VALUES("945.827.536-55",1,"Armando Fernandes","1997-05-12","(14) 99734-0987","ArmandoFernandes@gmail.com");

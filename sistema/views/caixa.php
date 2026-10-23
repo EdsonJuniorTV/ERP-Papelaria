@@ -47,7 +47,7 @@
     $produtos = mysqli_query($conexao,$sql);
 
     $custo_total = mysqli_fetch_assoc(
-        mysqli_query($conexao,"SELECT SUM(p.custo * e.qtd) as total FROM produto p JOIN estoque e ON p.id = e.id_prod WHERE e.qtd > 0")
+        mysqli_query($conexao,"SELECT SUM(p.custo * e.qtd) as total FROM produto p JOIN estoque e ON p.id = e.id_prod WHERE 1 = 1 AND e.qtd > 0 AND p.status = 'Ativo'")
     )['total'] ?? 0;
 ?>
 
@@ -57,13 +57,19 @@
 <meta charset="UTF-8">
 <title>Caixa</title>
 <link rel="stylesheet" href="/ERP-papelaria/sistema/public/css/caixa.css">
-<link rel="stylesheet" href="/ERP-papelaria/sistema/public/css/css.css">
+<link rel="stylesheet" href="/ERP-papelaria/sistema/public/css/css.css?v=1.2">
+<style>
+    .tabela-produtos { width: 100%; border-collapse: collapse; }
+    .tabela-produtos th { position: sticky; top: 0; background: #f3f4f6; text-align: left; padding: 12px 16px;
+        font-size: .82rem; color: #6b7280; text-transform: uppercase; letter-spacing: .05em; }
+    .tabela-produtos td { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; }
+</style>
 </head>
 <body>
     <div class="wrap" style="max-width: 1300px;">
         <div style="background-color: #1a56db; color: #ffffff; padding: 22px 28px; border-radius: 10px; 
         display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h1 style="color: #ffffff; margin: 0; font-size: 1.3rem;">Caixa</h1>
+            <h1 style="color: #ffffff; margin: 0; font-size: 1.3rem;">🛒Caixa</h1>
         </div>
 
         <!-- TELA 1: Seleção de Produtos -->
@@ -101,32 +107,30 @@
                     <button type="submit">Filtrar</button>
                 </form>
 
-                <div class="table">
-                    <div class="thead">
-                        <div>Código</div>
-                        <div>Produto</div>
-                        <div>Marca</div>
-                        <div>Fornecedor</div>
-                        <div>Preço</div>
-                        <div>Estoque</div>
-                        <div>Ações</div>
-                    </div>
-
-                    <div class="tbody" style="max-height: 350px; overflow-y: auto;">
-                        <?php while($p = mysqli_fetch_assoc($produtos)) { ?>
-                            <div class="tr" style="display: grid; grid-template-columns: 60px 2.5fr 1.2fr 2fr 100px 80px 50px; 
-                            align-items: center; padding: 12px 16px; border-bottom: 1px solid #e2e8f0; gap: 15px;">
-                                <div><?php echo $p['id']; ?></div>
-                                <div><?php echo $p['nome']; ?></div>
-                                <div><?php echo $p['marca']; ?></div>
-                                <div><?php echo $p['fornecedor']; ?></div>
-                                <div><?php echo number_format($p['preco'],2,',','.'); ?></div>
-                                <div id="est_<?php echo $p['id']; ?>">
-                                    <?php echo $p['qtd']; ?>
-                                </div>
-                                <div>
-                                    <div style="padding: 2px">
-                                        <button class="botaoAdd" 
+                <div style="max-height: 350px; overflow-y: auto;">
+                    <table class="tabela-produtos">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Produto</th>
+                                <th>Marca</th>
+                                <th>Fornecedor</th>
+                                <th>Preço</th>
+                                <th>Estoque</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php while($p = mysqli_fetch_assoc($produtos)) { ?>
+                                <tr>
+                                    <td><?php echo $p['id']; ?></td>
+                                    <td><?php echo $p['nome']; ?></td>
+                                    <td><?php echo $p['marca']; ?></td>
+                                    <td><?php echo $p['fornecedor']; ?></td>
+                                    <td><?php echo number_format($p['preco'],2,',','.'); ?></td>
+                                    <td id="est_<?php echo $p['id']; ?>"><?php echo $p['qtd']; ?></td>
+                                    <td style="white-space: nowrap;">
+                                        <button class="botaoAdd"
                                         onclick="addCarrinho(
                                         '<?php echo $p['id']; ?>',
                                         '<?php echo addslashes($p['nome']); ?>',
@@ -134,17 +138,15 @@
                                         <?php echo $p['custo']; ?>)">
                                             +
                                         </button>
-                                    </div>
-                                    <div style="padding: 2px">
                                         <button class="botaoAdd"
                                         onclick="removerCarrinho('<?php echo $p['id']; ?>')">
                                             -
                                         </button>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php } ?>
-                    </div>
+                                    </td>
+                                </tr>
+                            <?php } ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 

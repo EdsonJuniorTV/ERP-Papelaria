@@ -31,7 +31,7 @@ $funcionarios = listarFuncionarios($conexao, $usuarioLogadoId);
                 <p style="color:rgba(255,255,255,.75); margin:0;">Cadastre, edite e gerencie os colaboradores</p>
             </div>
             <button onclick="abrirModal()" class="btn-success">
-                + Novo Funcionário
+                + ADICIONAR
             </button>
         </div>
 
@@ -43,6 +43,7 @@ $funcionarios = listarFuncionarios($conexao, $usuarioLogadoId);
                         <th style="padding:12px 16px; font-size:.82rem; color:#6b7280; text-transform:uppercase; letter-spacing:.05em;">Login</th>
                         <th style="padding:12px 16px; font-size:.82rem; color:#6b7280; text-transform:uppercase; letter-spacing:.05em;">Cargo</th>
                         <th style="padding:12px 16px; font-size:.82rem; color:#6b7280; text-transform:uppercase; letter-spacing:.05em;">Telefone</th>
+                        <th style="padding:12px 16px; font-size:.82rem; color:#6b7280; text-transform:uppercase; letter-spacing:.05em;">E-Mail</th>
                         <th style="padding:12px 16px; font-size:.82rem; color:#6b7280; text-transform:uppercase; letter-spacing:.05em;">Status</th>
                         <th style="padding:12px 16px; font-size:.82rem; color:#6b7280; text-transform:uppercase; letter-spacing:.05em;">Ações</th>
                     </tr>
@@ -65,6 +66,7 @@ $funcionarios = listarFuncionarios($conexao, $usuarioLogadoId);
                                     </span>
                                 </td>
                                 <td style="padding:13px 16px; color:#6b7280; font-size:.88rem;"><?= htmlspecialchars($f['fone']) ?></td>
+                                <td style="padding:13px 16px; color:#6b7280; font-size:.88rem;"><?= htmlspecialchars($f['email']) ?></td>
                                 <td style="padding:13px 16px;">
                                     <?php if ($f['status'] === 'Ativo'): ?>
                                         <span style="background:#d1fae5; color:#065f46; padding:3px 10px; border-radius:20px; font-size:.8rem; font-weight:600;"> Ativo</span>

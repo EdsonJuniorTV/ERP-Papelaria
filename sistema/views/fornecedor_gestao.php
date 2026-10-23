@@ -15,7 +15,7 @@ $todosFornecedores = listarFornecedores($conexao);
                 <p>Veja, adicione, altere ou remova fornecedores</p>
             </div>
             <button class="btn-success" onclick="abrirModalFornecedor()">
-                ADICIONAR
+                + ADICIONAR
             </button>
         </div>
         <div>

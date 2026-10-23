@@ -37,22 +37,41 @@
 </main>
 
 <script>
-    // Lógica simplificada para cadastros rápidos
     document.querySelectorAll('.form-rapido').forEach(form => {
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const tabela = form.dataset.tabela;
-            const nome = form.querySelector('input').value;
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
+        const input = form.querySelector('input');
+        const botao = form.querySelector('button');
+        const nome = input.value.trim();
+        if (!nome) return;
+
+        botao.disabled = true;
+
+        try {
             const res = await fetch('../controllers/api.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ tipo_entidade: 'auxiliar', tabela: tabela, nome: nome })
+                body: JSON.stringify({
+                    tipo_entidade: 'auxiliar',
+                    tabela: form.dataset.tabela,
+                    nome: nome
+                })
             });
 
             const dados = await res.json();
             alert(dados.mensagem);
-            if(dados.status) location.reload();
+
+            if (dados.status) {
+                form.reset();
+                input.focus();
+            }
+            } catch (erro) {
+                console.error('Erro:', erro);
+                alert('Erro de comunicação com o servidor.');
+            } finally {
+                botao.disabled = false;
+            }
         });
     });
 </script>

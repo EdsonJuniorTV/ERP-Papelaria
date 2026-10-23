@@ -71,36 +71,75 @@ while ($row = mysqli_fetch_assoc($res_grafico)) {
 <!-- Biblioteca Chart.js para o gráfico -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+<style>
+    main.dashboard-container { padding: 0 0 28px; }
+    /* Título e subtítulo */
+    .fin-header {
+        background: linear-gradient(135deg, #1a56db, #1e40af);
+        padding: 22px 28px;
+        border-radius: var(--radius) var(--radius) 0 0;
+        margin-bottom: 20px;
+    }
+    .fin-header h1 {
+        display: flex; align-items: center; gap: 10px;
+        margin: 0; font-size: 1.4rem; color: #fff;
+    }
+    .fin-header p {
+        margin: 4px 0 0; font-size: .88rem; color: rgba(255,255,255,.78);
+    }
+
+    /* Filtro de período */
+    .fin-filtro {
+        display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px;
+        margin-top: 20px; padding: 16px 20px;
+        background: var(--surface-alt);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+    }
+    .fin-filtro-titulo {
+        align-self: center; margin-right: 8px;
+        font-family: var(--font-display); font-size: .95rem; font-weight: 700; color: var(--text);
+    }
+    .fin-filtro .form-group { min-width: 150px; }
+</style>
+
 <main class="dashboard-container">
-    <div class="header" style="margin-bottom: 20px;">
-        <div>
-            <h1>💰 Painel Financeiro</h1>
-            <p>Acompanhe o desempenho do caixa e o fluxo de vendas</p>
-        </div>
+    <div class="fin-header">
+        <h1>💰 Painel Financeiro</h1>
+        <p>Acompanhe o desempenho do caixa e o fluxo de vendas</p>
     </div>
     <div style="padding: 0 28px;">
             <!-- Filtro por Mês e Ano -->
-        <form method="GET" style="margin-top: 20px; background: #fff; padding: 15px; border-radius: 8px; display: flex; gap: 10px; align-items: center;">
-            <label><b>Filtrar Período:</b></label>
-            <select name="mes" style="padding: 5px;">
-                <?php 
-                $meses_pt = [
-                    1 => 'Janeiro', 2 => 'Fevereiro', 3 => 'Março', 4 => 'Abril', 
-                    5 => 'Maio', 6 => 'Junho', 7 => 'Julho', 8 => 'Agosto', 
-                    9 => 'Setembro', 10 => 'Outubro', 11 => 'Novembro', 12 => 'Dezembro'
-                ];
-                for($m = 1; $m <= 12; $m++): ?>
-                    <option value="<?= $m ?>" <?= ($mes_selecionado == $m) ? 'selected' : '' ?>>
-                        <?= $meses_pt[$m] ?>
-                    </option>
-                <?php endfor; ?>
-            </select>
-            <select name="ano" style="padding: 5px;">
-                <?php for($a = date('Y'); $a >= date('Y') - 3; $a--): ?>
-                    <option value="<?= $a ?>" <?= ($ano_selecionado == $a) ? 'selected' : '' ?>><?= $a ?></option>
-                <?php endfor; ?>
-            </select>
-            <button type="submit" class="btn" style="padding: 6px 15px; background: #2980b9; color: #fff; border: none; border-radius: 4px;">Filtrar</button>
+        <form method="GET" class="fin-filtro">
+            <span class="fin-filtro-titulo">📅 Filtrar período</span>
+
+            <div class="form-group">
+                <label for="f-mes">Mês</label>
+                <select id="f-mes" name="mes">
+                    <?php 
+                    $meses_pt = [
+                        1 => 'Janeiro', 2 => 'Fevereiro', 3 => 'Março', 4 => 'Abril', 
+                        5 => 'Maio', 6 => 'Junho', 7 => 'Julho', 8 => 'Agosto', 
+                        9 => 'Setembro', 10 => 'Outubro', 11 => 'Novembro', 12 => 'Dezembro'
+                    ];
+                    for($m = 1; $m <= 12; $m++): ?>
+                        <option value="<?= $m ?>" <?= ($mes_selecionado == $m) ? 'selected' : '' ?>>
+                            <?= $meses_pt[$m] ?>
+                        </option>
+                    <?php endfor; ?>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="f-ano">Ano</label>
+                <select id="f-ano" name="ano">
+                    <?php for($a = date('Y'); $a >= date('Y') - 3; $a--): ?>
+                        <option value="<?= $a ?>" <?= ($ano_selecionado == $a) ? 'selected' : '' ?>><?= $a ?></option>
+                    <?php endfor; ?>
+                </select>
+            </div>
+
+            <button type="submit">Filtrar</button>
         </form>
 
         <!-- Indicadores Principais -->

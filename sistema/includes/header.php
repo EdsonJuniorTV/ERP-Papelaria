@@ -15,6 +15,7 @@ $total_alertas = $dados_alerta['total'] ?? 0;
 
 // Pega o nome do usuário logado (ou mostra 'Usuário' por precaução)
 $nome_usuario = $_SESSION['user_nome'] ?? 'Usuário';
+$cargo = $_SESSION['user_cargo']
 ?>
 
 <!DOCTYPE html>
@@ -23,7 +24,7 @@ $nome_usuario = $_SESSION['user_nome'] ?? 'Usuário';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="/ERP-papelaria/sistema/public/css/css.css?v=1.1">
+    <link rel="stylesheet" href="/ERP-papelaria/sistema/public/css/css.css?v=1.2">
     <title>Papelaria - Gestão</title>
 </head>
 <body>
@@ -36,23 +37,29 @@ $nome_usuario = $_SESSION['user_nome'] ?? 'Usuário';
                 <ul>
                     <!-- Adicionado o caminho absoluto raiz em todos os links -->
                     <li><a href="/ERP-papelaria/sistema/views/dashboard.php">📊 Dashboard</a></li>
-                    <li><a href="/ERP-papelaria/sistema/views/caixa.php">🛒 Caixa</a></li>
+                    <?php if($cargo == "Vendedor" || $cargo == "Gerente"): ?>
+                        <li><a href="/ERP-papelaria/sistema/views/cliente_gestao.php">👥 Clientes</a></li>
+                        <li><a href="/ERP-papelaria/sistema/views/caixa.php">🛒 Caixa</a></li>
+                    <?php endif; ?>
+                    <?php if($cargo == "Repositor" || $cargo == "Gerente"): ?>
+                        <li><a href="/ERP-papelaria/sistema/views/fornecedor_gestao.php">🚚 Fornecedores</a></li>
+                        <li><a href="/ERP-papelaria/sistema/views/cadastrar_produto.php">✏️ Produtos</a></li>
+                        <li>
+                            <a href="/ERP-papelaria/sistema/views/estoque.php">
+                                📦 Estoque 
+                                <?php if($total_alertas > 0): ?>
+                                    <span style="background: red; color: white; padding: 2px 6px; border-radius: 50%; font-size: 10px; font-weight: bold; margin-left: 5px;">
+                                        <?= $total_alertas ?>
+                                    </span>
+                                <?php endif; ?>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+                    <?php if($cargo == "Gerente"): ?>
+                        <li><a href="/ERP-papelaria/sistema/views/funcionarios_gestao.php">👔 RH</a></li>
+                        <li><a href="/ERP-papelaria/sistema/views/financeiro.php">💵 Financeiro</a></li>
+                    <?php endif; ?>
                     <li><a href="/ERP-papelaria/sistema/views/configuracoes.php">⚙ Configurações</a></li>
-                    <li>
-                        <a href="/ERP-papelaria/sistema/views/estoque.php">
-                            📦 Estoque 
-                            <?php if($total_alertas > 0): ?>
-                                <span style="background: red; color: white; padding: 2px 6px; border-radius: 50%; font-size: 10px; font-weight: bold; margin-left: 5px;">
-                                    <?= $total_alertas ?>
-                                </span>
-                            <?php endif; ?>
-                        </a>
-                    </li>
-                    <li><a href="/ERP-papelaria/sistema/views/funcionarios_gestao.php">👔 RH</a></li>
-                    <li><a href="/ERP-papelaria/sistema/views/cadastrar_produto.php">✏️ Produtos</a></li>
-                    <li><a href="/ERP-papelaria/sistema/views/financeiro.php">💵 Financeiro</a></li>
-                    <li><a href="/ERP-papelaria/sistema/views/fornecedor_gestao.php">🚚 Fornecedores</a></li>
-                    <li><a href="/ERP-papelaria/sistema/views/cliente_gestao.php">👥 Clientes</a></li>
                 </ul>
             </nav>
             <div class="user-info">
